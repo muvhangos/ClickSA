@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live South African & Global News</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; margin:0; padding:0; }
+    header { background: #1a73e8; color: #fff; padding: 20px; text-align:center; font-size:26px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .rotating-earth { width: 40px; height: 40px; animation: spin 5s linear infinite; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .news-container { display:flex; flex-wrap:wrap; justify-content:center; gap:20px; padding:20px; }
+    .news-card { background:#fff; width:300px; border-radius:8px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.1); display:flex; flex-direction:column; transition:transform .2s; }
+    .news-card:hover { transform:translateY(-5px); }
+    .news-card img { width:100%; height:180px; object-fit:cover; }
+    .news-content { padding:15px; flex:1; display:flex; flex-direction:column; }
+    .news-title { font-size:18px; margin:0 0 10px; color:#222; }
+    .news-desc { font-size:14px; color:#555; flex:1; margin-bottom:10px; }
+    .news-meta { font-size:12px; color:#888; margin-bottom:10px; }
+    footer { text-align:center; padding:15px; background:#ddd; margin-top:20px; font-size:14px; color:#333; }
+  </style>
+</head>
+<body>
+
+<header>
+  🌍 Live South African & Global News
+  <img src="https://upload.wikimedia.org/wikipedia/commons/e/ef/Earth_rotate_icon.png" alt="Rotating Earth" class="rotating-earth">
+</header>
+
+<div class="news-container" id="newsContainer">
+  <!-- News cards inserted here -->
+</div>
+
+<footer>&copy; 2025 Live News Page</footer>
+
+<script>
+// RSS feeds including South African sources
+const feeds = [
+  { url: 'https://feeds.bbci.co.uk/news/world/rss.xml', region: 'Worldwide/UK' },
+  { url: 'https://rss.cnn.com/rss/edition_us.rss', region: 'USA' },
+  { url: 'https://allafrica.com/tools/headlines/africa/headlines.xml', region: 'Africa' },
+  { url: 'https://www.groundup.org.za/feed/', region: 'South Africa' },
+  { url: 'https://www.news24.com/rss', region: 'South Africa' },
+  { url: 'https://www.timeslive.co.za/rss/', region: 'South Africa' },
+  { url: 'https://ewn.co.za/rss', region: 'South Africa' }
+];
+
+async function fetchFeed(feed) {
+  try {
+    const resp = await fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(feed.url));
+    const data = await resp.json();
+    if (!data.items) return [];
+    return data.items.map(item => ({
+      title: item.title,
+      description: item.description || '',
+      link: item.link,
+      image: (item.enclosure && item.enclosure.link) || (item.thumbnail) || '',
+      region: feed.region
+    }));
+  } catch (e) {
+    console.error('Error fetching feed:', feed.url, e);
+    return [];
+  }
+}
+
+async function loadNews() {
+  const container = document.getElementById('newsContainer');
+  container.innerHTML = '';
+  let allNews = [];
+  for (const f of feeds) {
+    const items = await fetchFeed(f);
+    allNews = allNews.concat(items);
+  }
+  allNews.sort(() => 0.5 - Math.random());
+  const toShow = allNews.slice(0, 20); // show up to 20 items
+
+  toShow.forEach(article => {
+    const card = document.createElement('div');
+    card.className = 'news-card';
+    card.innerHTML = `
+      <img src="${article.image || 'https://via.placeholder.com/300x180?text=No+Image'}" alt="News Image">
+      <div class="news-content">
+        <div class="news-title">${article.title}</div>
+        <div class="news-desc">${article.description.replace(/<[^>]+>/g,'').substring(0,120) + '...'}</div>
+        <div class="news-meta">${article.region}</div>
+        <a href="${article.link}" target="_blank">Read More</a>
+      </div>`;
+    container.appendChild(card);
+  });
+}
+
+loadNews();
+setInterval(loadNews, 5 * 60 * 1000); // auto-update every 5 minutes
+</script>
+
+</body>
+</html>
