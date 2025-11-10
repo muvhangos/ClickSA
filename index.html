@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,12 +5,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Live South African & Global News</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f4f4f4; margin:0; padding:0; }
-    header { background: #1a73e8; color: #fff; padding: 20px; text-align:center; font-size:26px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-    .rotating-earth { width: 40px; height: 40px; animation: spin 5s linear infinite; }
-    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-    .news-container { display:flex; flex-wrap:wrap; justify-content:center; gap:20px; padding:20px; }
-    .news-card { background:#fff; width:300px; border-radius:8px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.1); display:flex; flex-direction:column; transition:transform .2s; }
+    body { font-family: Arial, sans-serif; background: #f4f4f4; margin:0; padding:0; overflow-x:hidden; }
+    header {
+      background: #1a73e8;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      font-size: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .rotating-earth { width:40px; height:40px; animation:spin 5s linear infinite; }
+    @keyframes spin { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+
+    .live-status {
+      font-size: 15px;
+      color: #fff;
+      text-align: center;
+      margin-top: -10px;
+      animation: pulse 2s infinite;
+      background: #1a73e8;
+      padding: 6px 12px;
+    }
+    @keyframes pulse {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+
+    .news-container {
+      display:flex; flex-wrap:wrap; justify-content:center;
+      gap:20px; padding:20px;
+    }
+    .news-card {
+      background:#fff; width:300px; border-radius:8px;
+      overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.1);
+      display:flex; flex-direction:column; transition:transform .2s;
+    }
     .news-card:hover { transform:translateY(-5px); }
     .news-card img { width:100%; height:180px; object-fit:cover; }
     .news-content { padding:15px; flex:1; display:flex; flex-direction:column; }
@@ -19,6 +53,43 @@
     .news-desc { font-size:14px; color:#555; flex:1; margin-bottom:10px; }
     .news-meta { font-size:12px; color:#888; margin-bottom:10px; }
     footer { text-align:center; padding:15px; background:#ddd; margin-top:20px; font-size:14px; color:#333; }
+
+    /* TV-style ticker */
+    .ticker-bar {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: #1a73e8;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      height: 40px;
+      overflow: hidden;
+      font-weight: bold;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.2);
+      z-index: 999;
+      transition: background 0.5s ease;
+    }
+    .ticker-bar.breaking {
+      background: #d32f2f; /* bright red for breaking */
+    }
+    .ticker-clock {
+      flex: 0 0 auto;
+      padding: 0 20px;
+      border-right: 2px solid rgba(255,255,255,0.3);
+      font-size: 15px;
+    }
+    .ticker-text {
+      white-space: nowrap;
+      flex: 1;
+      animation: scrollText 30s linear infinite;
+      padding-left: 20px;
+      font-size: 15px;
+    }
+    @keyframes scrollText {
+      from { transform: translateX(100%); }
+      to { transform: translateX(-100%); }
+    }
   </style>
 </head>
 <body>
@@ -28,14 +99,21 @@
   <img src="https://upload.wikimedia.org/wikipedia/commons/e/ef/Earth_rotate_icon.png" alt="Rotating Earth" class="rotating-earth">
 </header>
 
+<div class="live-status" id="liveStatus">🔄 Live Updating… | Last update: --:--:--</div>
+
 <div class="news-container" id="newsContainer">
   <p>Loading news...</p>
 </div>
 
 <footer>&copy; 2025 Live News Page</footer>
 
+<!-- Bottom ticker -->
+<div class="ticker-bar" id="tickerBar">
+  <div class="ticker-clock" id="liveClock">🕒 00:00:00</div>
+  <div class="ticker-text" id="breakingTicker">🔔 Loading breaking headlines...</div>
+</div>
+
 <script>
-// RSS feeds including South African sources
 const feeds = [
   { url: 'https://feeds.bbci.co.uk/news/world/rss.xml', region: 'Worldwide/UK' },
   { url: 'https://rss.cnn.com/rss/edition_us.rss', region: 'USA' },
@@ -46,66 +124,104 @@ const feeds = [
   { url: 'https://ewn.co.za/rss', region: 'South Africa' }
 ];
 
+const container = document.getElementById('newsContainer');
+const statusEl = document.getElementById('liveStatus');
+const clockEl = document.getElementById('liveClock');
+const tickerEl = document.getElementById('breakingTicker');
+const tickerBar = document.getElementById('tickerBar');
+
+let cache = JSON.parse(localStorage.getItem('cachedNews')) || { time: 0, items: [] };
+
+function formatTime(date) {
+  return date.toLocaleTimeString('en-ZA', { hour12: false });
+}
+
+function updateLiveClock() {
+  const now = new Date();
+  clockEl.textContent = '🕒 ' + now.toLocaleTimeString('en-ZA', { hour12: false });
+}
+
+function updateStatusClock() {
+  if (cache.time) {
+    const time = new Date(cache.time);
+    statusEl.innerHTML = `🔄 Live Updating… | Last update: ${formatTime(time)}`;
+  }
+}
+
+function renderNews(news) {
+  container.innerHTML = '';
+  news.slice(0, 25).forEach(article => {
+    const card = document.createElement('div');
+    card.className = 'news-card';
+    card.innerHTML = `
+      <img src="${article.image || 'https://via.placeholder.com/300x180?text=No+Image'}" alt="News Image">
+      <div class="news-content">
+        <div class="news-title">${article.title}</div>
+        <div class="news-desc">${article.description.replace(/<[^>]+>/g,'').substring(0,120)}...</div>
+        <div class="news-meta">${article.region}</div>
+        <a href="${article.link}" target="_blank">Read More</a>
+      </div>`;
+    container.appendChild(card);
+  });
+
+  // Update ticker text
+  const headlines = news.slice(0, 10).map(n => `🗞️ ${n.title}`).join('   •   ');
+  tickerEl.innerHTML = headlines;
+}
+
 async function fetchFeed(feed) {
   try {
-    const resp = await fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(feed.url));
-    const data = await resp.json();
+    const response = await fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(feed.url));
+    const data = await response.json();
     if (!data.items) return [];
     return data.items.map(item => ({
       title: item.title,
       description: item.description || '',
       link: item.link,
-      image: (item.enclosure && item.enclosure.link) || (item.thumbnail) || '',
+      image: (item.enclosure && item.enclosure.link) || item.thumbnail || '',
       region: feed.region
     }));
-  } catch (e) {
-    console.error('Error fetching feed:', feed.url, e);
+  } catch {
     return [];
   }
 }
 
 async function loadNews() {
-  const container = document.getElementById('newsContainer');
-  container.innerHTML = '<p>Loading news...</p>';
+  statusEl.textContent = '🔄 Updating news...';
+  if (Date.now() - cache.time < 60 * 1000 && cache.items.length > 0) {
+    renderNews(cache.items);
+    updateStatusClock();
+  } else {
+    container.innerHTML = '<p>Loading latest news...</p>';
+  }
 
-  try {
-    // Fetch all feeds in parallel
-    const feedPromises = feeds.map(f => fetchFeed(f));
-    const results = await Promise.all(feedPromises);
-    let allNews = results.flat();
+  const newsCollection = [];
 
-    // Prioritize South African news first
-    let localNews = allNews.filter(n => n.region === 'South Africa');
-    let otherNews = allNews.filter(n => n.region !== 'South Africa');
+  for (const feed of feeds) {
+    fetchFeed(feed).then(feedNews => {
+      newsCollection.push(...feedNews);
+      const sa = newsCollection.filter(n => n.region === 'South Africa');
+      const others = newsCollection.filter(n => n.region !== 'South Africa');
+      const sorted = [...sa, ...others].sort(() => 0.5 - Math.random());
+      renderNews(sorted);
+      cache = { time: Date.now(), items: sorted };
+      localStorage.setItem('cachedNews', JSON.stringify(cache));
 
-    // Shuffle within each group for variety
-    localNews.sort(() => 0.5 - Math.random());
-    otherNews.sort(() => 0.5 - Math.random());
-
-    const toShow = [...localNews, ...otherNews].slice(0, 20);
-
-    container.innerHTML = ''; // clear loading
-    toShow.forEach(article => {
-      const card = document.createElement('div');
-      card.className = 'news-card';
-      card.innerHTML = `
-        <img src="${article.image || 'https://via.placeholder.com/300x180?text=No+Image'}" alt="News Image">
-        <div class="news-content">
-          <div class="news-title">${article.title}</div>
-          <div class="news-desc">${article.description.replace(/<[^>]+>/g,'').substring(0,120) + '...'}</div>
-          <div class="news-meta">${article.region}</div>
-          <a href="${article.link}" target="_blank">Read More</a>
-        </div>`;
-      container.appendChild(card);
+      // Activate breaking news mode
+      tickerBar.classList.add('breaking');
+      statusEl.innerHTML = `🚨 Breaking News Updated | ${formatTime(new Date())}`;
+      setTimeout(() => {
+        tickerBar.classList.remove('breaking');
+        updateStatusClock();
+      }, 10000);
     });
-  } catch (e) {
-    container.innerHTML = '<p>Error loading news. Please try again later.</p>';
-    console.error('Error loading news:', e);
   }
 }
 
 loadNews();
-setInterval(loadNews, 5 * 60 * 1000); // auto-update every 5 minutes
+setInterval(loadNews, 60 * 1000);
+setInterval(updateLiveClock, 1000);
+setInterval(updateStatusClock, 1000);
 </script>
 
 </body>
