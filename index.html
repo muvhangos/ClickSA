@@ -1,118 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Live South African & Global News</title>
-  <style>
-    body { font-family: Arial, sans-serif; background: #f4f4f4; margin:0; padding:0; overflow-x:hidden; }
-    header {
-      background: #1a73e8;
-      color: #fff;
-      padding: 20px;
-      text-align: center;
-      font-size: 26px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    }
-    .rotating-earth { width:40px; height:40px; animation:spin 5s linear infinite; }
-    @keyframes spin { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
-
-    .live-status {
-      font-size: 15px;
-      color: #fff;
-      text-align: center;
-      margin-top: -10px;
-      animation: pulse 2s infinite;
-      background: #1a73e8;
-      padding: 6px 12px;
-    }
-    @keyframes pulse {
-      0% { opacity: 0.6; }
-      50% { opacity: 1; }
-      100% { opacity: 0.6; }
-    }
-
-    .news-container {
-      display:flex; flex-wrap:wrap; justify-content:center;
-      gap:20px; padding:20px;
-    }
-    .news-card {
-      background:#fff; width:300px; border-radius:8px;
-      overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.1);
-      display:flex; flex-direction:column; transition:transform .2s;
-    }
-    .news-card:hover { transform:translateY(-5px); }
-    .news-card img { width:100%; height:180px; object-fit:cover; }
-    .news-content { padding:15px; flex:1; display:flex; flex-direction:column; }
-    .news-title { font-size:18px; margin:0 0 10px; color:#222; }
-    .news-desc { font-size:14px; color:#555; flex:1; margin-bottom:10px; }
-    .news-meta { font-size:12px; color:#888; margin-bottom:10px; }
-    footer { text-align:center; padding:15px; background:#ddd; margin-top:20px; font-size:14px; color:#333; }
-
-    /* TV-style ticker */
-    .ticker-bar {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      background: #1a73e8;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      height: 40px;
-      overflow: hidden;
-      font-weight: bold;
-      box-shadow: 0 -2px 8px rgba(0,0,0,0.2);
-      z-index: 999;
-      transition: background 0.5s ease;
-    }
-    .ticker-bar.breaking {
-      background: #d32f2f; /* bright red for breaking */
-    }
-    .ticker-clock {
-      flex: 0 0 auto;
-      padding: 0 20px;
-      border-right: 2px solid rgba(255,255,255,0.3);
-      font-size: 15px;
-    }
-    .ticker-text {
-      white-space: nowrap;
-      flex: 1;
-      animation: scrollText 30s linear infinite;
-      padding-left: 20px;
-      font-size: 15px;
-    }
-    @keyframes scrollText {
-      from { transform: translateX(100%); }
-      to { transform: translateX(-100%); }
-    }
-  </style>
-</head>
-<body>
-
-<header>
-  🌍 Live South African & Global News
-  <img src="https://upload.wikimedia.org/wikipedia/commons/e/ef/Earth_rotate_icon.png" alt="Rotating Earth" class="rotating-earth">
-</header>
-
-<div class="live-status" id="liveStatus">🔄 Live Updating… | Last update: --:--:--</div>
-
-<div class="news-container" id="newsContainer">
-  <p>Loading news...</p>
-</div>
-
-<footer>&copy; 2025 Live News Page</footer>
-
-<!-- Bottom ticker -->
-<div class="ticker-bar" id="tickerBar">
-  <div class="ticker-clock" id="liveClock">🕒 00:00:00</div>
-  <div class="ticker-text" id="breakingTicker">🔔 Loading breaking headlines...</div>
-</div>
-
 <script>
 const feeds = [
   { url: 'https://feeds.bbci.co.uk/news/world/rss.xml', region: 'Worldwide/UK' },
@@ -125,27 +10,23 @@ const feeds = [
 ];
 
 const container = document.getElementById('newsContainer');
-const statusEl = document.getElementById('liveStatus');
-const clockEl = document.getElementById('liveClock');
-const tickerEl = document.getElementById('breakingTicker');
-const tickerBar = document.getElementById('tickerBar');
-
+const liveText = document.getElementById('liveUpdate');
+const earthLogo = document.getElementById('earthLogo');
 let cache = JSON.parse(localStorage.getItem('cachedNews')) || { time: 0, items: [] };
 
-function formatTime(date) {
-  return date.toLocaleTimeString('en-ZA', { hour12: false });
+function animateLiveText() {
+  const dots = ['.', '..', '...', ''];
+  let i = 0;
+  setInterval(() => {
+    liveText.textContent = `🔄 Live Updating${dots[i]}`;
+    i = (i + 1) % dots.length;
+  }, 600);
 }
 
-function updateLiveClock() {
-  const now = new Date();
-  clockEl.textContent = '🕒 ' + now.toLocaleTimeString('en-ZA', { hour12: false });
-}
-
-function updateStatusClock() {
-  if (cache.time) {
-    const time = new Date(cache.time);
-    statusEl.innerHTML = `🔄 Live Updating… | Last update: ${formatTime(time)}`;
-  }
+function glowEarth(active) {
+  earthLogo.style.boxShadow = active
+    ? '0 0 40px rgba(0, 200, 255, 0.9), 0 0 80px rgba(0, 200, 255, 0.5)'
+    : '0 0 20px rgba(0, 200, 255, 0.6)';
 }
 
 function renderNews(news) {
@@ -163,10 +44,6 @@ function renderNews(news) {
       </div>`;
     container.appendChild(card);
   });
-
-  // Update ticker text
-  const headlines = news.slice(0, 10).map(n => `🗞️ ${n.title}`).join('   •   ');
-  tickerEl.innerHTML = headlines;
 }
 
 async function fetchFeed(feed) {
@@ -187,10 +64,12 @@ async function fetchFeed(feed) {
 }
 
 async function loadNews() {
-  statusEl.textContent = '🔄 Updating news...';
+  liveText.style.color = '#00cc66';
+  liveText.textContent = '🔄 Updating news...';
+  glowEarth(true);
+
   if (Date.now() - cache.time < 60 * 1000 && cache.items.length > 0) {
     renderNews(cache.items);
-    updateStatusClock();
   } else {
     container.innerHTML = '<p>Loading latest news...</p>';
   }
@@ -206,23 +85,17 @@ async function loadNews() {
       renderNews(sorted);
       cache = { time: Date.now(), items: sorted };
       localStorage.setItem('cachedNews', JSON.stringify(cache));
-
-      // Activate breaking news mode
-      tickerBar.classList.add('breaking');
-      statusEl.innerHTML = `🚨 Breaking News Updated | ${formatTime(new Date())}`;
-      setTimeout(() => {
-        tickerBar.classList.remove('breaking');
-        updateStatusClock();
-      }, 10000);
     });
   }
+
+  setTimeout(() => {
+    glowEarth(false);
+    liveText.style.color = '#999';
+    liveText.textContent = '✅ News is Live';
+  }, 4000);
 }
 
+animateLiveText();
 loadNews();
 setInterval(loadNews, 60 * 1000);
-setInterval(updateLiveClock, 1000);
-setInterval(updateStatusClock, 1000);
 </script>
-
-</body>
-</html>
