@@ -216,27 +216,48 @@ async function loadTopPicks(){
 
 // Top Picks Carousel Animation
 let topPickIndex = 0;
+let currentTranslate = 0;
+const topPicksEl = document.getElementById('topPicks');
 function slideTopPicks() {
-  const topPicks = document.getElementById('topPicks');
-  const totalCards = topPicks.children.length;
+  const totalCards = topPicksEl.children.length;
   if(totalCards <= 3) return; // No sliding needed
   topPickIndex = (topPickIndex + 1) % totalCards;
-  const cardWidth = topPicks.children[0].offsetWidth + 20; // width + gap
-  topPicks.style.transform = `translateX(-${cardWidth * topPickIndex}px)`;
+  const cardWidth = topPicksEl.children[0].offsetWidth + 20; // width + gap
+  currentTranslate = -cardWidth * topPickIndex;
+  topPicksEl.style.transition = 'transform 0.5s ease';
+  topPicksEl.style.transform = `translateX(${currentTranslate}px)`;
+  setTimeout(() => { topPicksEl.style.transition = ''; }, 500);
 }
+setInterval(slideTopPicks, 4000);
+
+// Touch swipe support
+let startX = 0;
+let isDragging = false;
+topPicksEl.addEventListener('touchstart', e => { startX = e.touches[0].clientX; isDragging = true; });
+topPicksEl.addEventListener('touchmove', e => {
+  if(!isDragging) return;
+  const diff = e.touches[0].clientX - startX;
+  topPicksEl.style.transform = `translateX(${currentTranslate + diff}px)`;
+});
+topPicksEl.addEventListener('touchend', e => {
+  isDragging = false;
+  const diff = e.changedTouches[0].clientX - startX;
+  const cardWidth = topPicksEl.children[0].offsetWidth + 20;
+  if(diff < -50 && topPickIndex < topPicksEl.children.length - 3) topPickIndex++;
+  else if(diff > 50 && topPickIndex > 0) topPickIndex--;
+  currentTranslate = -cardWidth * topPickIndex;
+  topPicksEl.style.transition = 'transform 0.5s ease';
+  topPicksEl.style.transform = `translateX(${currentTranslate}px)`;
+  setTimeout(() => { topPicksEl.style.transition = ''; }, 500);
+});
 
 // Back to Top button
 const backToTopBtn = document.getElementById("backToTop");
 window.onscroll = function() {
-  if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
-    backToTopBtn.style.display = "block";
-  } else {
-    backToTopBtn.style.display = "none";
-  }
+  if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) backToTopBtn.style.display = "block";
+  else backToTopBtn.style.display = "none";
 };
-backToTopBtn.addEventListener("click", function() {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-});
+backToTopBtn.addEventListener("click", () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
 
 // Breaking News marquee
 async function loadBreakingNews() {
@@ -259,7 +280,6 @@ function showCategory(cat){
 loadNews('general');
 loadTopPicks();
 loadBreakingNews();
-setInterval(slideTopPicks,4000);
 setInterval(()=>{
   const active=document.querySelector('nav button.active').innerText.toLowerCase();
   loadNews(active);
