@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ClickSA | Live South African Headlines</title>
-<meta name="description" content="Get the latest breaking news from South Africa. ClickSA brings you real-time updates on local, business, and sports headlines.">
+<meta name="description" content="ClickSA brings you the latest breaking news, local insights, and top stories from South Africa.">
 <style>
 body { font-family: 'Poppins', sans-serif; background: #f8f9fa; margin: 0; padding: 0; color: #222; }
 header { background: linear-gradient(to right, #007bff, #00b74a, #ffcc00); color: white; text-align: center; padding: 20px; font-size: 1.8em; font-weight: bold; display:flex; justify-content:center; align-items:center; gap:10px; overflow:hidden; }
@@ -12,8 +12,6 @@ header { background: linear-gradient(to right, #007bff, #00b74a, #ffcc00); color
 .click-icon { display:inline-block; margin-left:8px; animation: clickMove 1s infinite; }
 @keyframes spin { from { transform: rotateY(0deg); } to { transform: rotateY(360deg); } }
 @keyframes clickMove { 0% { transform: translateY(0); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0); } }
-.hand-svg path { animation: colorPulse 3s infinite; }
-@keyframes colorPulse { 0% { fill: #007bff; } 33% { fill: #00b74a; } 66% { fill: #ffcc00; } 100% { fill: #007bff; } }
 nav { display:flex; justify-content:center; background:#222; color:white; gap:20px; padding:10px; }
 nav button { background:none; border:none; color:white; cursor:pointer; font-size:1em; transition: color 0.3s; }
 nav button:hover { color:#00b74a; }
@@ -27,34 +25,8 @@ nav button.active { border-bottom:2px solid #ffcc00; color:#ffcc00; }
 .news-desc { font-size:14px; color:#555; margin-bottom:10px; }
 .news-meta { font-size:12px; color:#888; margin-bottom:10px; }
 .ads { background:#f1f1f1; text-align:center; margin:20px; padding:10px; border-radius:8px; font-size:14px; }
-footer { text-align:center; background:#111; color:white; padding:15px; margin-top:30px; font-size:14px; }
-
-/* Back to Top button */
-#backToTop {
-  display: none;
-  position: fixed;
-  bottom: 40px;
-  right: 30px;
-  z-index: 99;
-  font-size: 18px;
-  border: none;
-  outline: none;
-  background-color: #00b74a;
-  color: white;
-  cursor: pointer;
-  padding: 12px 16px;
-  border-radius: 50%;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  transition: background 0.3s, transform 0.3s;
-}
-#backToTop:hover { background-color: #007bff; transform: scale(1.1); }
-
-/* Breaking News Marquee */
-#breakingNews { background:#ffcc00; color:#222; padding:8px 0; font-weight:bold; font-size:14px; overflow:hidden; white-space:nowrap; }
-#breakingNewsContent { display:inline-block; padding-left:100%; animation: scrollLeft 20s linear infinite; }
-@keyframes scrollLeft { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
-
-/* Top Picks Carousel */
+#backToTop { display:none; position:fixed; bottom:40px; right:30px; z-index:99; font-size:18px; border:none; outline:none; background-color:#00b74a; color:white; cursor:pointer; padding:12px 16px; border-radius:50%; box-shadow:0 2px 6px rgba(0,0,0,0.3); transition: background 0.3s, transform 0.3s; }
+#backToTop:hover { background-color:#007bff; transform: scale(1.1); }
 #topPicksWrapper { overflow:hidden; }
 #topPicks { display:flex; gap:20px; transition:transform 0.5s ease; }
 .news-card { min-width:280px; flex-shrink:0; }
@@ -65,17 +37,12 @@ footer { text-align:center; background:#111; color:white; padding:15px; margin-t
 <header>
   🇿🇦 ClickSA
   <span class="click-icon">
-    <svg class="hand-svg" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <svg width="24" height="24" viewBox="0 0 24 24">
       <path d="M2 21h2V9.414l5.293 5.293 1.414-1.414L6 7.586V3h2v4.586l4.293 4.293 1.414-1.414L10 5.586V3h2v7.586l4 4V5h2v11.586l3.707 3.707-1.414 1.414L2 5V21z"/>
     </svg>
   </span>
   <img class="logo-icon" src="https://upload.wikimedia.org/wikipedia/commons/a/af/Flag_of_South_Africa.svg" alt="SA Flag">
 </header>
-
-<!-- Breaking News Marquee -->
-<section id="breakingNews">
-  <div id="breakingNewsContent">Loading breaking news...</div>
-</section>
 
 <nav>
   <button class="active" onclick="showCategory('general')">General</button>
@@ -84,15 +51,15 @@ footer { text-align:center; background:#111; color:white; padding:15px; margin-t
 </nav>
 
 <div class="ads">
-  [Your AdSense ad will appear here]
+  <!-- Replace with your actual AdSense code -->
+  [Your AdSense ad here]
 </div>
 
 <section style="padding:20px; text-align:center; max-width:700px; margin:auto;">
   <h2>Welcome to ClickSA</h2>
-  <p>Your home for fresh, real-time updates from South Africa. We bring you the top stories, insightful business coverage, and the latest in local sports — all in one place.</p>
+  <p>Fresh news, original insights, and top stories from South Africa. ClickSA adds commentary and analysis for context, making it more than just a feed.</p>
 </section>
 
-<!-- Top Picks Carousel -->
 <section style="padding:20px; text-align:center; max-width:900px; margin:auto;">
   <h2>Top Picks of the Day</h2>
   <div id="topPicksWrapper">
@@ -102,23 +69,24 @@ footer { text-align:center; background:#111; color:white; padding:15px; margin-t
 
 <section style="padding:20px; text-align:center; max-width:700px; margin:auto;">
   <h2>Local Insights</h2>
-  <p>Stay informed with expert commentary and analysis on current events affecting South Africa. This section provides context and perspectives that help you understand the bigger picture.</p>
+  <p>Original commentary and summaries for South African news. These insights help visitors understand the story behind the headlines.</p>
 </section>
 
 <div id="newsContainer" class="news-container">
   <p>Loading latest headlines...</p>
 </div>
 
-<!-- Back to Top button -->
 <button id="backToTop" title="Back to Top">⬆️</button>
 
 <footer>
   &copy; 2025 ClickSA | Powered by Wintech Technologies<br>
   <a href="#" style="color:#ffcc00;">Privacy Policy</a> | 
+  <a href="#" style="color:#00b74a;">About</a> | 
   <a href="#" style="color:#00b74a;">Contact</a>
 </footer>
 
 <script>
+// Categories and feeds
 const categories = {
   general: [
     { url:'https://www.news24.com/rss', region:'South Africa' },
@@ -145,44 +113,51 @@ const fallbackImages = [
   'https://via.placeholder.com/300x180?text=South+Africa'
 ];
 
+// Fetch and process feed
 async function fetchFeed(feed){
-  try{
+  try {
     const resp = await fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(feed.url));
     const data = await resp.json();
     if(!data.items) return [];
-    return data.items.map(item=>({
+    return data.items.map(item => ({
       title: item.title,
       description: item.description || '',
       link: item.link,
       image: (item.enclosure && item.enclosure.link) || item.thumbnail || '',
-      region: feed.region
+      region: feed.region,
+      commentary: generateCommentary(item.title, item.description)
     }));
-  }catch(e){ console.error('Feed error:', feed.url); return []; }
+  } catch(e) {
+    console.error('Feed error:', feed.url);
+    return [];
+  }
 }
 
-function generateSummary(desc, wordLimit=35){
-  const text = desc.replace(/<[^>]+>/g,'');
-  const words = text.split(/\s+/);
-  if(words.length <= wordLimit) return text;
-  return words.slice(0,wordLimit).join(' ')+'…';
+// Original commentary for AdSense
+function generateCommentary(title, description){
+  const text = description.replace(/<[^>]+>/g,'').trim();
+  if(!text) return `Stay informed with the latest updates on "${title}". ClickSA provides insights and context.`;
+  const sentences = text.split('.').filter(s=>s.trim().length>20);
+  const summary = sentences.slice(0,2).join('. ') + '.';
+  return summary + ' ClickSA provides original insight for South African readers.';
 }
 
+// Populate main news section
 async function loadNews(category='general'){
   const container=document.getElementById('newsContainer');
   container.innerHTML='<p>Loading news...</p>';
-  const feedPromises=categories[category].map(feed=>fetchFeed(feed));
-  const allNewsArrays=await Promise.all(feedPromises);
-  const allNews=allNewsArrays.flat();
+  const feedPromises = categories[category].map(feed=>fetchFeed(feed));
+  const allNewsArrays = await Promise.all(feedPromises);
+  const allNews = allNewsArrays.flat();
   container.innerHTML='';
   allNews.slice(0,18).forEach(article=>{
-    const card=document.createElement('div');
+    const card = document.createElement('div');
     card.className='news-card';
     card.innerHTML=`
-      <img src="${article.image || fallbackImages[Math.floor(Math.random()*fallbackImages.length)]}" 
-           alt="News Image" loading="lazy">
+      <img src="${article.image || fallbackImages[Math.floor(Math.random()*fallbackImages.length)]}" alt="News Image" loading="lazy">
       <div class="news-content">
         <div class="news-title">${article.title}</div>
-        <div class="news-desc">${generateSummary(article.description)}</div>
+        <div class="news-desc">${article.commentary}</div>
         <div class="news-meta">${article.region}</div>
         <a href="${article.link}" target="_blank">Read Full Story</a>
       </div>`;
@@ -190,23 +165,23 @@ async function loadNews(category='general'){
   });
 }
 
+// Populate Top Picks
 async function loadTopPicks(){
-  const container=document.getElementById('topPicks');
+  const container = document.getElementById('topPicks');
   container.innerHTML='';
-  const allFeeds=[...categories.general,...categories.business,...categories.sports];
-  const feedPromises=allFeeds.map(feed=>fetchFeed(feed));
-  const allNewsArrays=await Promise.all(feedPromises);
-  let allNews=allNewsArrays.flat();
+  const allFeeds = [...categories.general,...categories.business,...categories.sports];
+  const feedPromises = allFeeds.map(feed=>fetchFeed(feed));
+  const allNewsArrays = await Promise.all(feedPromises);
+  let allNews = allNewsArrays.flat();
   allNews.sort(()=>Math.random()-0.5);
   allNews.slice(0,5).forEach(article=>{
-    const card=document.createElement('div');
+    const card = document.createElement('div');
     card.className='news-card';
     card.innerHTML=`
-      <img src="${article.image || fallbackImages[Math.floor(Math.random()*fallbackImages.length)]}" 
-           alt="Top Pick Image" loading="lazy">
+      <img src="${article.image || fallbackImages[Math.floor(Math.random()*fallbackImages.length)]}" alt="Top Pick Image" loading="lazy">
       <div class="news-content">
         <div class="news-title">${article.title}</div>
-        <div class="news-desc">${generateSummary(article.description)}</div>
+        <div class="news-desc">${article.commentary}</div>
         <div class="news-meta">${article.region}</div>
         <a href="${article.link}" target="_blank">Read Full Story</a>
       </div>`;
@@ -214,77 +189,64 @@ async function loadTopPicks(){
   });
 }
 
-// Top Picks Carousel Animation
-let topPickIndex = 0;
-let currentTranslate = 0;
+// Top Picks carousel logic
+let topPickIndex=0, currentTranslate=0;
 const topPicksEl = document.getElementById('topPicks');
 function slideTopPicks() {
   const totalCards = topPicksEl.children.length;
-  if(totalCards <= 3) return; // No sliding needed
-  topPickIndex = (topPickIndex + 1) % totalCards;
-  const cardWidth = topPicksEl.children[0].offsetWidth + 20; // width + gap
-  currentTranslate = -cardWidth * topPickIndex;
-  topPicksEl.style.transition = 'transform 0.5s ease';
-  topPicksEl.style.transform = `translateX(${currentTranslate}px)`;
-  setTimeout(() => { topPicksEl.style.transition = ''; }, 500);
+  if(totalCards<=3) return;
+  topPickIndex=(topPickIndex+1)%totalCards;
+  const cardWidth = topPicksEl.children[0].offsetWidth+20;
+  currentTranslate = -cardWidth*topPickIndex;
+  topPicksEl.style.transition='transform 0.5s ease';
+  topPicksEl.style.transform=`translateX(${currentTranslate}px)`;
+  setTimeout(()=>{ topPicksEl.style.transition=''; },500);
 }
-setInterval(slideTopPicks, 4000);
+setInterval(slideTopPicks,4000);
 
-// Touch swipe support
-let startX = 0;
-let isDragging = false;
-topPicksEl.addEventListener('touchstart', e => { startX = e.touches[0].clientX; isDragging = true; });
-topPicksEl.addEventListener('touchmove', e => {
+// Touch swipe for Top Picks
+let startX=0,isDragging=false;
+topPicksEl.addEventListener('touchstart',e=>{ startX=e.touches[0].clientX; isDragging=true; });
+topPicksEl.addEventListener('touchmove',e=>{
   if(!isDragging) return;
-  const diff = e.touches[0].clientX - startX;
-  topPicksEl.style.transform = `translateX(${currentTranslate + diff}px)`;
+  const diff = e.touches[0].clientX-startX;
+  topPicksEl.style.transform=`translateX(${currentTranslate+diff}px)`;
 });
-topPicksEl.addEventListener('touchend', e => {
-  isDragging = false;
-  const diff = e.changedTouches[0].clientX - startX;
-  const cardWidth = topPicksEl.children[0].offsetWidth + 20;
-  if(diff < -50 && topPickIndex < topPicksEl.children.length - 3) topPickIndex++;
-  else if(diff > 50 && topPickIndex > 0) topPickIndex--;
-  currentTranslate = -cardWidth * topPickIndex;
-  topPicksEl.style.transition = 'transform 0.5s ease';
-  topPicksEl.style.transform = `translateX(${currentTranslate}px)`;
-  setTimeout(() => { topPicksEl.style.transition = ''; }, 500);
+topPicksEl.addEventListener('touchend',e=>{
+  isDragging=false;
+  const diff = e.changedTouches[0].clientX-startX;
+  const cardWidth = topPicksEl.children[0].offsetWidth+20;
+  if(diff<-50 && topPickIndex<topPicksEl.children.length-3) topPickIndex++;
+  else if(diff>50 && topPickIndex>0) topPickIndex--;
+  currentTranslate=-cardWidth*topPickIndex;
+  topPicksEl.style.transition='transform 0.5s ease';
+  topPicksEl.style.transform=`translateX(${currentTranslate}px)`;
+  setTimeout(()=>{ topPicksEl.style.transition=''; },500);
 });
 
 // Back to Top button
-const backToTopBtn = document.getElementById("backToTop");
-window.onscroll = function() {
-  if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) backToTopBtn.style.display = "block";
-  else backToTopBtn.style.display = "none";
+const backToTopBtn=document.getElementById("backToTop");
+window.onscroll=function(){
+  if(document.body.scrollTop>300||document.documentElement.scrollTop>300) backToTopBtn.style.display="block";
+  else backToTopBtn.style.display="none";
 };
-backToTopBtn.addEventListener("click", () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+backToTopBtn.addEventListener("click",()=>{ window.scrollTo({top:0,behavior:'smooth'}); });
 
-// Breaking News marquee
-async function loadBreakingNews() {
-  const container = document.getElementById('breakingNewsContent');
-  const allFeeds = [...categories.general, ...categories.business, ...categories.sports];
-  const feedPromises = allFeeds.map(feed => fetchFeed(feed));
-  const allNewsArrays = await Promise.all(feedPromises);
-  const allNews = allNewsArrays.flat();
-  const headlines = allNews.slice(0, 10).map(item => `⚡ ${item.title}`).join('  •  ');
-  container.innerText = headlines;
-}
-
+// Category switch
 function showCategory(cat){
   document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
   event.target.classList.add('active');
   loadNews(cat);
+  loadTopPicks();
 }
 
 // Initial load
 loadNews('general');
 loadTopPicks();
-loadBreakingNews();
 setInterval(()=>{
   const active=document.querySelector('nav button.active').innerText.toLowerCase();
   loadNews(active);
   loadTopPicks();
-  loadBreakingNews();
 },5*60*1000);
 </script>
 
