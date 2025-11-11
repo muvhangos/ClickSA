@@ -53,6 +53,11 @@ footer { text-align:center; background:#111; color:white; padding:15px; margin-t
 #breakingNews { background:#ffcc00; color:#222; padding:8px 0; font-weight:bold; font-size:14px; overflow:hidden; white-space:nowrap; }
 #breakingNewsContent { display:inline-block; padding-left:100%; animation: scrollLeft 20s linear infinite; }
 @keyframes scrollLeft { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
+
+/* Top Picks Carousel */
+#topPicksWrapper { overflow:hidden; }
+#topPicks { display:flex; gap:20px; transition:transform 0.5s ease; }
+.news-card { min-width:280px; flex-shrink:0; }
 </style>
 </head>
 <body>
@@ -87,10 +92,11 @@ footer { text-align:center; background:#111; color:white; padding:15px; margin-t
   <p>Your home for fresh, real-time updates from South Africa. We bring you the top stories, insightful business coverage, and the latest in local sports — all in one place.</p>
 </section>
 
+<!-- Top Picks Carousel -->
 <section style="padding:20px; text-align:center; max-width:900px; margin:auto;">
   <h2>Top Picks of the Day</h2>
-  <div id="topPicks" class="news-container">
-    <p>Loading Top Picks...</p>
+  <div id="topPicksWrapper">
+    <div id="topPicks" class="news-container"></div>
   </div>
 </section>
 
@@ -186,14 +192,13 @@ async function loadNews(category='general'){
 
 async function loadTopPicks(){
   const container=document.getElementById('topPicks');
-  container.innerHTML='<p>Loading Top Picks...</p>';
+  container.innerHTML='';
   const allFeeds=[...categories.general,...categories.business,...categories.sports];
   const feedPromises=allFeeds.map(feed=>fetchFeed(feed));
   const allNewsArrays=await Promise.all(feedPromises);
   let allNews=allNewsArrays.flat();
   allNews.sort(()=>Math.random()-0.5);
-  container.innerHTML='';
-  allNews.slice(0,3).forEach(article=>{
+  allNews.slice(0,5).forEach(article=>{
     const card=document.createElement('div');
     card.className='news-card';
     card.innerHTML=`
@@ -209,10 +214,15 @@ async function loadTopPicks(){
   });
 }
 
-function showCategory(cat){
-  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
-  event.target.classList.add('active');
-  loadNews(cat);
+// Top Picks Carousel Animation
+let topPickIndex = 0;
+function slideTopPicks() {
+  const topPicks = document.getElementById('topPicks');
+  const totalCards = topPicks.children.length;
+  if(totalCards <= 3) return; // No sliding needed
+  topPickIndex = (topPickIndex + 1) % totalCards;
+  const cardWidth = topPicks.children[0].offsetWidth + 20; // width + gap
+  topPicks.style.transform = `translateX(-${cardWidth * topPickIndex}px)`;
 }
 
 // Back to Top button
@@ -239,12 +249,17 @@ async function loadBreakingNews() {
   container.innerText = headlines;
 }
 
+function showCategory(cat){
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  loadNews(cat);
+}
+
 // Initial load
 loadNews('general');
 loadTopPicks();
 loadBreakingNews();
-
-// Refresh every 5 minutes
+setInterval(slideTopPicks,4000);
 setInterval(()=>{
   const active=document.querySelector('nav button.active').innerText.toLowerCase();
   loadNews(active);
