@@ -1,285 +1,411 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>ClickSA | Live South African Headlines & Events</title>
-<meta name="description" content="ClickSA delivers original summaries of South African news, sports, business, and events with local insights.">
+<meta name="description" content="ClickSA — live South African news, events, entertainment and local insights." />
 <style>
-body { font-family:'Poppins',sans-serif; background:#f8f9fa; margin:0; padding:0; color:#222; }
-header { background:linear-gradient(to right,#007bff,#00b74a,#ffcc00); color:white; text-align:center; padding:20px; font-size:1.8em; font-weight:bold; display:flex; justify-content:center; align-items:center; gap:10px; position:relative; }
-.logo-icon { width:35px; height:25px; border-radius:4px; animation:spin 6s linear infinite; }
-.click-icon { display:inline-block; margin-left:8px; animation:clickMove 1s infinite; }
-@keyframes spin { from{transform:rotateY(0);} to{transform:rotateY(360deg);} }
-@keyframes clickMove { 0%{transform:translateY(0);} 50%{transform:translateY(-5px);} 100%{transform:translateY(0);} }
+  :root{--accent:#00b74a;--accent2:#007bff;--accent3:#ffcc00;--bg:#f8f9fa;--card:#fff}
+  *{box-sizing:border-box}
+  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial; margin:0;background:var(--bg);color:#222}
+  header{display:flex;align-items:center;gap:10px;justify-content:center;padding:14px 16px;background:linear-gradient(90deg,var(--accent2),var(--accent),var(--accent3));color:#fff}
+  .site-title{font-weight:700;font-size:1.25rem}
+  .logo-icon{width:35px;height:25px;border-radius:3px;object-fit:cover}
+  nav{display:flex;gap:12px;justify-content:center;background:#222;padding:10px;flex-wrap:wrap}
+  nav button{background:none;border:none;color:#fff;cursor:pointer;padding:8px 10px;font-size:0.95rem}
+  nav button.active{border-bottom:2px solid var(--accent3);color:var(--accent3)}
+  main{max-width:1200px;margin:18px auto;padding:0 14px}
+  .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+  h2{margin:0;font-size:1.2rem}
+  .carousel-wrap{position:relative;min-height:220px;display:block}
+  .cards{position:relative;height:100%;display:block}
+  .card{position:absolute;left:0;top:0;width:100%;opacity:0;transition:opacity .8s ease;display:flex;gap:0;align-items:stretch}
+  .card.visible{opacity:1;z-index:2}
+  .card-inner{background:var(--card);border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.08);overflow:hidden;display:flex;flex-direction:column;width:100%}
+  .card img{width:100%;height:180px;object-fit:cover;display:block}
+  .card .content{padding:12px}
+  .title{font-weight:700;margin-bottom:8px;font-size:1rem}
+  .desc{color:#555;font-size:0.92rem;line-height:1.2;max-height:3.6em;overflow:hidden}
+  .meta{font-size:0.82rem;color:#888;margin-top:8px}
+  .actions{margin-top:10px}
+  .actions a{color:var(--accent2);text-decoration:none;font-weight:600}
+  /* nav arrows (optional) */
+  .carousel-controls{position:absolute;inset:0;pointer-events:none}
+  .carousel-controls button{pointer-events:auto;position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.35);border:none;color:#fff;padding:8px;border-radius:999px;cursor:pointer}
+  .carousel-controls button.left{left:10px}
+  .carousel-controls button.right{right:10px}
+  /* small responsive */
+  @media(min-width:720px){
+    .card{display:flex}
+    .card img{width:45%;height:220px}
+    .card .content{width:55%}
+  }
 
-#cityAlerts { background:#ff4444; color:white; text-align:center; padding:10px; font-weight:bold; font-size:14px; }
+  /* Events grid (carousel uses same classes) */
+  .events-wrap{margin-top:18px}
+  .small-meta{font-size:0.85rem;color:#666}
 
-nav { display:flex; justify-content:center; background:#222; color:white; gap:20px; padding:10px; flex-wrap:wrap; position:sticky; top:0; z-index:99; }
-nav button { background:none; border:none; color:white; cursor:pointer; font-size:1em; transition:color .3s; }
-nav button:hover { color:#00b74a; }
-nav button.active { border-bottom:2px solid #ffcc00; color:#ffcc00; }
-
-section { padding:20px; max-width:1100px; margin:auto; }
-h2 { text-align:center; margin-bottom:20px; color:#007bff; }
-
-.news-container, #eventsGrid { display:flex; flex-wrap:wrap; justify-content:center; gap:20px; }
-.news-card, .event-card { background:#fff; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1); overflow:hidden; width:300px; transition:transform .2s; display:flex; flex-direction:column; }
-.news-card:hover, .event-card:hover { transform:translateY(-5px); box-shadow:0 4px 10px rgba(0,0,0,0.2); }
-.news-card img, .event-card img { width:100%; height:180px; object-fit:cover; }
-.news-content, .event-content { padding:15px; display:flex; flex-direction:column; flex:1; }
-.news-title, .event-title { font-size:18px; font-weight:bold; margin-bottom:10px; color:#222; }
-.news-desc { font-size:14px; color:#555; margin-bottom:10px; }
-.news-meta, .event-date, .event-location { font-size:12px; color:#888; margin-bottom:6px; }
-.event-date { color:#00b74a; }
-.event-location { color:#ff8800; }
-.event-link { background:#007bff; color:white; padding:8px 12px; border-radius:6px; text-decoration:none; display:inline-block; transition:transform .2s; }
-.event-link:hover { transform:scale(1.05); background:#00b74a; }
-.news-content a { background:#007bff; color:white; padding:8px 12px; border-radius:6px; text-decoration:none; display:inline-block; transition:transform .2s; }
-.news-content a:hover { transform:scale(1.05); background:#00b74a; }
-
-.ads { background:#f1f1f1; text-align:center; margin:20px 0; padding:10px; border-radius:8px; font-size:14px; }
-
-#backToTop { display:none; position:fixed; bottom:40px; right:30px; z-index:99; font-size:18px; border:none; outline:none; background-color:#00b74a; color:white; cursor:pointer; padding:12px 16px; border-radius:50%; box-shadow:0 2px 6px rgba(0,0,0,0.3); transition:background .3s, transform .3s; }
-#backToTop:hover { background-color:#007bff; transform:scale(1.1); }
-
-footer { text-align:center; padding:20px; font-size:14px; background:#222; color:white; }
-footer a { text-decoration:none; color:#ffcc00; }
-
-#breakingNews { background:#ffcc00; color:#222; padding:8px 0; font-weight:bold; white-space:nowrap; overflow:hidden; position:relative; }
-#breakingNewsContent { display:inline-block; padding-left:100%; }
-
-/* ---------- Carousel Styles ---------- */
-.carousel-container { position:relative; display:flex; align-items:center; max-width:1000px; margin:20px auto; overflow:hidden; }
-.carousel-track-container { overflow:hidden; width:100%; }
-.carousel-track { display:flex; transition:transform 0.5s ease-in-out; list-style:none; padding:0; margin:0; }
-.carousel-track li { min-width:300px; margin-right:20px; background:#fff; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1); display:flex; flex-direction:column; }
-.carousel-track img { width:100%; height:180px; object-fit:cover; border-radius:10px 10px 0 0; }
-.carousel-content { padding:10px; display:flex; flex-direction:column; }
-.carousel-title { font-weight:bold; font-size:16px; color:#007bff; margin-bottom:6px; }
-.carousel-desc { font-size:14px; color:#555; margin-bottom:6px; }
-.carousel-track a { background:#007bff; color:white; padding:6px 10px; border-radius:6px; text-decoration:none; display:inline-block; transition:transform .2s; }
-.carousel-track a:hover { transform:scale(1.05); background:#00b74a; }
-.carousel-btn { background:#00b74a; border:none; color:white; font-size:20px; padding:10px; cursor:pointer; border-radius:50%; margin:0 5px; }
-.carousel-btn:hover { background:#007bff; }
-
-/* ---------- Weather Styles ---------- */
-.weather-card {
-  background:#fff; border-radius:10px; padding:10px 15px; width:180px; text-align:center;
-  box-shadow:0 2px 8px rgba(0,0,0,0.1); transition:transform .2s; display:flex; flex-direction:column; align-items:center;
-}
-.weather-card:hover { transform:translateY(-5px); }
-.weather-city { font-weight:bold; font-size:16px; margin-bottom:5px; color:#007bff; }
-.weather-temp { font-size:18px; font-weight:bold; margin-bottom:5px; color:#222; }
-.weather-desc { font-size:14px; color:#555; }
-.weather-icon { width:50px; height:50px; margin-bottom:5px; }
+  /* admin dashboard hidden by default */
+  #adminPanel{display:none;padding:12px;background:#fff;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.06);margin:12px 0}
+  .revenue-sim{display:none}
+  /* show when admin key is present */
+  .show-admin{display:block}
+  /* footer */
+  footer{margin-top:18px;padding:18px;background:#222;color:#fff;text-align:center;font-size:0.9rem}
 </style>
 </head>
 <body>
 
 <header>
-  🇿🇦 ClickSA
-  <span class="click-icon">
-    <svg width="24" height="24" viewBox="0 0 24 24">
-      <path d="M2 21h2V9.414l5.293 5.293 1.414-1.414L6 7.586V3h2v4.586l4.293 4.293 1.414-1.414L10 5.586V3h2v7.586l4 4V5h2v11.586l3.707 3.707-1.414 1.414L2 5V21z"/>
-    </svg>
-  </span>
+  <div class="site-title">ClickSA</div>
   <img class="logo-icon" src="https://upload.wikimedia.org/wikipedia/commons/a/af/Flag_of_South_Africa.svg" alt="SA Flag">
 </header>
 
-<div id="cityAlerts">Loading live alerts...</div>
-
-<div id="breakingNews"><div id="breakingNewsContent">Loading breaking news...</div></div>
-
 <nav>
-  <button class="active" onclick="showCategory('general')">General</button>
-  <button onclick="showCategory('business')">Business</button>
-  <button onclick="showCategory('sports')">Sports</button>
-  <button onclick="showCategory('events')">Events</button>
+  <button class="active" data-cat="general" onclick="handleNav(event)">General</button>
+  <button data-cat="business" onclick="handleNav(event)">Business</button>
+  <button data-cat="sports" onclick="handleNav(event)">Sports</button>
+  <button data-cat="entertainment" onclick="handleNav(event)">Entertainment</button>
+  <button data-cat="events" onclick="handleNav(event)">Events</button>
 </nav>
 
-<div class="ads">[Insert AdSense Code Here]</div>
-
-<section id="mainContent">
-  <h2>Welcome to ClickSA</h2>
-  <p>Original South African news summaries, entertainment, and upcoming events with local insights.</p>
-</section>
-
-<!-- ---------- Weather Section ---------- -->
-<section id="weatherSection">
-  <h2>🌤️ South Africa City Weather</h2>
-  <div id="weatherContainer" style="display:flex; justify-content:center; flex-wrap:wrap; gap:15px;"></div>
-</section>
-
-<!-- ---------- Carousel Section ---------- -->
-<section id="carouselSection">
-  <h2>🔥 Top News & Events</h2>
-  <div class="carousel-container">
-    <button class="carousel-btn prev">⬅️</button>
-    <div class="carousel-track-container">
-      <ul class="carousel-track"></ul>
+<main>
+  <!-- NEWS -->
+  <section aria-labelledby="news-title">
+    <div class="section-head">
+      <h2 id="news-title">Top Headlines</h2>
+      <div class="small-meta">Live feed — updates every 5 minutes</div>
     </div>
-    <button class="carousel-btn next">➡️</button>
+
+    <div class="carousel-wrap" id="newsCarousel" onmouseenter="pauseCarousel('news')" onmouseleave="resumeCarousel('news')">
+      <div class="cards" id="newsCards"></div>
+      <div class="carousel-controls">
+        <button class="left" onclick="prevSlide('news')">◀</button>
+        <button class="right" onclick="nextSlide('news')">▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- EVENTS / ENTERTAINMENT -->
+  <section class="events-wrap" aria-labelledby="events-title" style="margin-top:22px">
+    <div class="section-head">
+      <h2 id="events-title">Events & Entertainment</h2>
+      <div class="small-meta">Local concerts, festivals & lifestyle events</div>
+    </div>
+
+    <div class="carousel-wrap" id="eventsCarousel" onmouseenter="pauseCarousel('events')" onmouseleave="resumeCarousel('events')">
+      <div class="cards" id="eventsCards"></div>
+      <div class="carousel-controls">
+        <button class="left" onclick="prevSlide('events')">◀</button>
+        <button class="right" onclick="nextSlide('events')">▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Admin dashboard (visible only with adminKey query) -->
+  <div id="adminPanel">
+    <h3>Admin — Revenue Simulator (ZAR)</h3>
+    <div style="display:flex;gap:12px;align-items:center">
+      <label>Daily visitors: <input id="adminVisitors" type="number" value="3000" style="width:120px;margin-left:8px"></label>
+      <button onclick="runRevenueCalc()">Calculate & Email</button>
+    </div>
+    <div style="margin-top:12px">
+      <strong>Estimated Daily:</strong> ZAR <span id="adminDaily">0</span> &nbsp; • &nbsp;
+      <strong>Estimated Monthly:</strong> ZAR <span id="adminMonthly">0</span>
+    </div>
+    <div style="margin-top:12px;color:#666">Emails are sent using EmailJS — replace placeholders with your IDs in the script.</div>
   </div>
-</section>
 
-<section id="newsSection">
-  <div id="newsContainer" class="news-container"><p>Loading latest headlines...</p></div>
-</section>
-
-<section id="eventsSection">
-  <h2>🎊 Upcoming Events Calendar (South Africa)</h2>
-  <div id="eventsGrid"><p>Loading upcoming events...</p></div>
-</section>
-
-<button id="backToTop" title="Back to Top">⬆️</button>
+</main>
 
 <footer>
-  &copy; 2025 ClickSA | Powered by Wintech Technologies<br>
-  <a href="#">Privacy Policy</a> | 
-  <a href="#">About</a> | 
-  <a href="#">Contact</a>
+  &copy; 2025 ClickSA • Local news, events & entertainment • Contact: muvhangos@gmail.com
 </footer>
 
+<!-- EmailJS library -->
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
 <script>
-// ---------- RSS Feeds ----------
-const categories = {
-  general:['https://www.news24.com/rss','https://ewn.co.za/RSS','https://www.timeslive.co.za/rss/'],
-  business:['https://www.businesslive.co.za/bd/rss/','https://businesstech.co.za/news/feed/'],
-  sports:['https://www.sport24.co.za/RSS','https://ewn.co.za/RSS/Sport'],
-  events:['https://www.channel24.co.za/rss','https://www.capetownmagazine.com/rss','https://www.joburg.co.za/feed/']
+/* =========================
+   Configuration
+   - Update EmailJS IDs below before deploying
+   - You can change adminKey to your own secret
+   ========================= */
+const EMAILJS_USER_ID = 'YOUR_EMAILJS_USER_ID';
+const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID';
+const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
+const ADMIN_KEY = 'supersecret'; // change if desired
+
+// Initialize EmailJS (client-side)
+if(typeof emailjs !== 'undefined' && EMAILJS_USER_ID && EMAILJS_USER_ID !== 'YOUR_EMAILJS_USER_ID'){
+  emailjs.init(EMAILJS_USER_ID);
+}
+
+/* -------------------------
+   RSS sources (mix includes entertainment/events)
+   You can add/remove feeds as you like.
+   ------------------------- */
+const RSS_FEEDS = {
+  general: [
+    'https://www.news24.com/rss',
+    'https://ewn.co.za/RSS'
+  ],
+  business: [
+    'https://www.businesslive.co.za/bd/rss/',
+    'https://businesstech.co.za/feed/'
+  ],
+  sports: [
+    'https://www.sport24.co.za/RSS',
+    'https://www.bbc.co.uk/sport/africa/rss.xml'
+  ],
+  entertainment: [
+    'https://www.channel24.co.za/rss', // contains entertainment
+    'https://www.iol.co.za/entertainment/rss'
+  ],
+  events: [
+    'https://www.capetownmagazine.com/rss',
+    'https://www.joburg.co.za/feed/' // may provide events listing
+  ]
 };
-const fallbackImages = ['https://via.placeholder.com/300x180?text=ClickSA+News'];
 
-// ---------- Fetch Feed ----------
-async function fetchFeed(url){
+/* -------------------------
+   Fallback images & settings
+   ------------------------- */
+const FALLBACK_IMG = 'https://via.placeholder.com/800x450?text=ClickSA';
+const ROTATE_INTERVAL_MS = 10000; // 10s
+const REFRESH_FEEDS_MS = 5 * 60 * 1000; // refresh feeds every 5 minutes
+const RSS2JSON = url => `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`;
+
+/* -------------------------
+   Carousel state
+   ------------------------- */
+const state = {
+  news: { items: [], index: 0, timer: null, paused: false },
+  events: { items: [], index: 0, timer: null, paused: false }
+};
+
+/* -------------------------
+   Helpers: fetch RSS (rss2json)
+   ------------------------- */
+async function fetchFeedUrl(url){
   try{
-    const resp = await fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(url));
-    const data = await resp.json();
-    if(!data.items) return [];
-    return data.items.slice(0,6).map(item=>({
-      title:item.title,
-      description:item.description?.replace(/<[^>]+>/g,'').split('.').slice(0,2).join('.')||item.title,
-      link:item.link,
-      image:item.thumbnail||fallbackImages[Math.floor(Math.random()*fallbackImages.length)]
+    const resp = await fetch(RSS2JSON(url), {cache: "no-store"});
+    if(!resp.ok) throw new Error('network');
+    const json = await resp.json();
+    return (json.items || []).map(it => ({
+      title: it.title || '',
+      link: it.link || '#',
+      description: (it.description || it.content || '').replace(/(<([^>]+)>)/gi, ''),
+      pubDate: it.pubDate || '',
+      thumbnail: (it.thumbnail || it.enclosure && it.enclosure.link) || FALLBACK_IMG
     }));
-  }catch(e){ return []; }
+  }catch(e){
+    console.warn('feed failed', url, e);
+    return [];
+  }
 }
 
-// ---------- Load News ----------
-async function loadCategoryNews(cat){
-  const container=document.getElementById('newsContainer');
-  container.innerHTML='<p>Loading news...</p>';
-  const feeds=categories[cat]||[];
-  const results=await Promise.all(feeds.map(fetchFeed));
-  const articles=results.flat();
-  container.innerHTML='';
-  articles.forEach(a=>{
-    const card=document.createElement('div');
-    card.className='news-card';
-    card.innerHTML=`<img src="${a.image}" alt="News"><div class="news-content"><div class="news-title">${a.title}</div><div class="news-desc">${a.description}</div><a href="${a.link}" target="_blank">Read More</a></div>`;
+async function loadFeedsForCategory(cat){
+  const feeds = RSS_FEEDS[cat] || [];
+  let items = [];
+  for(const f of feeds){
+    const got = await fetchFeedUrl(f);
+    items = items.concat(got);
+  }
+  // shuffle a bit for variety
+  items = items.sort(()=>Math.random()-0.5);
+  return items;
+}
+
+/* -------------------------
+   Render functions
+   ------------------------- */
+function renderCarousel(targetId, listKey){
+  const container = document.getElementById(targetId);
+  container.innerHTML = '';
+  const items = state[listKey].items;
+  if(!items || items.length === 0){
+    const nof = document.createElement('div');
+    nof.className = 'card visible';
+    nof.innerHTML = `<div class="card-inner"><div class="card"><div class="card-inner"><div class="content" style="padding:20px"><div class="title">No items available</div><div class="desc">Feed failed or no items. Try again later.</div></div></div></div>`;
+    container.appendChild(nof);
+    return;
+  }
+  items.forEach((it, idx) => {
+    const card = document.createElement('div');
+    card.className = 'card' + (idx === state[listKey].index ? ' visible' : '');
+    const inner = document.createElement('div');
+    inner.className = 'card-inner';
+    inner.innerHTML = `
+      <img src="${it.thumbnail || FALLBACK_IMG}" alt="">
+      <div class="content">
+        <div class="title">${it.title}</div>
+        <div class="desc">${it.description || ''}</div>
+        <div class="meta">${it.pubDate ? new Date(it.pubDate).toLocaleString() : ''}</div>
+        <div class="actions"><a href="${it.link}" target="_blank" rel="noopener">Read full story</a></div>
+      </div>`;
+    card.appendChild(inner);
     container.appendChild(card);
   });
 }
 
-// ---------- Load Events ----------
-async function loadEvents(){
-  const grid=document.getElementById('eventsGrid');
-  grid.innerHTML='<p>Loading events...</p>';
-  const feeds=categories.events;
-  const results=await Promise.all(feeds.map(fetchFeed));
-  const events=results.flat();
-  grid.innerHTML='';
-  events.forEach(ev=>{
-    const div=document.createElement('div');
-    div.className='event-card';
-    div.innerHTML=`<img src="${ev.image}" alt="Event"><div class="event-content"><div class="event-title">${ev.title}</div><div class="event-date">🗓️ ${new Date().toLocaleDateString('en-ZA')}</div><div class="event-location">South Africa</div><a class="event-link" href="${ev.link}" target="_blank">View Event Details</a></div>`;
-    grid.appendChild(div);
+/* -------------------------
+   Carousel controls: rotate, next, prev, pause, resume
+   ------------------------- */
+function startCarousel(key){
+  stopCarousel(key);
+  state[key].timer = setInterval(()=> {
+    if(!state[key].paused && state[key].items.length > 0){
+      nextSlide(key);
+    }
+  }, ROTATE_INTERVAL_MS);
+}
+function stopCarousel(key){
+  if(state[key].timer) { clearInterval(state[key].timer); state[key].timer = null; }
+}
+function pauseCarousel(key){ state[key].paused = true; }
+function resumeCarousel(key){ state[key].paused = false; }
+function nextSlide(key){
+  const len = state[key].items.length;
+  if(len === 0) return;
+  state[key].index = (state[key].index + 1) % len;
+  updateVisibleCard(key);
+}
+function prevSlide(key){
+  const len = state[key].items.length;
+  if(len === 0) return;
+  state[key].index = (state[key].index - 1 + len) % len;
+  updateVisibleCard(key);
+}
+function updateVisibleCard(key){
+  const container = (key === 'news') ? document.getElementById('newsCards') : document.getElementById('eventsCards');
+  const cards = container.querySelectorAll('.card');
+  cards.forEach((c,i)=>{
+    c.classList.toggle('visible', i === state[key].index);
   });
 }
 
-// ---------- Carousel ----------
-async function loadCarousel(){
-  const track = document.querySelector('.carousel-track');
-  track.innerHTML='';
-  const allFeeds=[...categories.general,...categories.events];
-  const results=await Promise.all(allFeeds.map(fetchFeed));
-  const items=results.flat().slice(0,12);
-  items.forEach(i=>{
-    const li=document.createElement('li');
-    li.innerHTML=`<img src="${i.image}" alt="Top Item"><div class="carousel-content"><div class="carousel-title">${i.title}</div><div class="carousel-desc">${i.description}</div><a href="${i.link}" target="_blank">Read More</a></div>`;
-    track.appendChild(li);
-  });
-  let index=0;
-  const total=track.children.length;
-  const prevBtn=document.querySelector('.carousel-btn.prev');
-  const nextBtn=document.querySelector('.carousel-btn.next');
-  function updateCarousel(){ const slideWidth = track.children[0].getBoundingClientRect().width + 20; track.style.transform = `translateX(-${index * slideWidth}px)`; }
-  nextBtn.addEventListener('click', ()=>{ index = (index + 1) % total; updateCarousel(); });
-  prevBtn.addEventListener('click', ()=>{ index = (index - 1 + total) % total; updateCarousel(); });
-  setInterval(()=>{ index = (index + 1) % total; updateCarousel(); },5000);
+/* -------------------------
+   Load & initialize both carousels
+   ------------------------- */
+async function initCarousel(key, targetId, feedCategory){
+  // load items
+  const items = await loadFeedsForCategory(feedCategory);
+  state[key].items = items;
+  state[key].index = 0;
+  renderCarousel(targetId, key);
+  startCarousel(key);
 }
 
-// ---------- Breaking News Ticker ----------
-async function loadBreakingNews(){
-  const allFeeds=[...categories.general,...categories.business,...categories.sports,...categories.events];
-  const results=await Promise.all(allFeeds.map(fetchFeed));
-  const allNews=results.flat().slice(0,15);
-  const container=document.getElementById('breakingNewsContent');
-  container.innerText = allNews.map(a=>`🎉 ${a.title}`).join('  •  ');
-  let start=container.offsetWidth;
-  container.style.transform=`translateX(${start}px)`;
-  const speed=1;
-  function tick(){ const left=container.getBoundingClientRect().left; if(left+container.offsetWidth<0) container.style.transform=`translateX(${window.innerWidth}px)`; else container.style.transform=`translateX(${left-speed}px)`; requestAnimationFrame(tick); }
-  tick();
+/* -------------------------
+   Periodic refresh of feed data
+   ------------------------- */
+async function refreshAll(){
+  await initCarousel('news', 'newsCards', 'general');
+  // also load business and sports behind the scenes and merge for variety
+  const business = await loadFeedsForCategory('business');
+  const sports = await loadFeedsForCategory('sports');
+  // mix them in the news list for more variety
+  state.news.items = state.news.items.concat(business).concat(sports).sort(()=>Math.random()-0.5).slice(0,20);
+  renderCarousel('newsCards', 'news'); // re-render
+  startCarousel('news');
+
+  // events + entertainment
+  const ent = await loadFeedsForCategory('entertainment');
+  const events = await loadFeedsForCategory('events');
+  state.events.items = ent.concat(events).sort(()=>Math.random()-0.5).slice(0,16);
+  state.events.index = 0;
+  renderCarousel('eventsCards', 'events');
+  startCarousel('events');
 }
 
-// ---------- City Alerts ----------
-const alertCities=['Johannesburg','Cape Town','Durban','Pretoria','Port Elizabeth'];
-function loadCityAlerts(){
-  const container=document.getElementById('cityAlerts');
-  const types=['Storm Warning','Heavy Rain','Heat Alert','Festival Today','Traffic Advisory'];
-  const alerts = alertCities.map(c=>`⚠️ ${c}: ${types[Math.floor(Math.random()*types.length)]}`);
-  container.innerHTML=alerts.join('  •  ');
+/* -------------------------
+   Nav handler
+   ------------------------- */
+function handleNav(e){
+  const btn = e.currentTarget;
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const cat = btn.dataset.cat;
+  // if user selected a feed category (general/business/sports/entertainment) show a filtered news list
+  (async ()=>{
+    if(cat === 'events'){
+      // focus events carousel area (no change)
+      document.getElementById('eventsCarousel').scrollIntoView({behavior:'smooth'});
+    } else {
+      // load that feed into the news carousel
+      const items = await loadFeedsForCategory(cat);
+      state.news.items = items.length ? items : state.news.items;
+      state.news.index = 0;
+      renderCarousel('newsCards', 'news');
+      startCarousel('news');
+      document.getElementById('newsCarousel').scrollIntoView({behavior:'smooth'});
+    }
+  })();
 }
-loadCityAlerts();
-setInterval(loadCityAlerts,10*60*1000);
 
-// ---------- Weather ----------
-const cities = [
-  {name:'Johannesburg', icon:'☀️'}, 
-  {name:'Cape Town', icon:'⛅'}, 
-  {name:'Durban', icon:'🌧️'}, 
-  {name:'Pretoria', icon:'🌤️'}, 
-  {name:'Port Elizabeth', icon:'🌦️'}
-];
-function randomTemp(min=16,max=35){ return Math.floor(Math.random()*(max-min+1))+min; }
-function randomDesc(){ const desc=['Sunny','Partly Cloudy','Rainy','Stormy','Windy','Clear']; return desc[Math.floor(Math.random()*desc.length)]; }
-function loadWeather(){
-  const container=document.getElementById('weatherContainer');
-  container.innerHTML='';
-  cities.forEach(c=>{
-    const card=document.createElement('div');
-    card.className='weather-card';
-    card.innerHTML=`<div class="weather-city">${c.name}</div><div class="weather-icon">${c.icon}</div><div class="weather-temp">${randomTemp()}°C</div><div class="weather-desc">${randomDesc()}</div>`;
-    container.appendChild(card);
-  });
+/* -------------------------
+   Revenue simulator (admin)
+   - calculates ZAR estimates, shows dashboard when adminKey found
+   - sends email using EmailJS (client-side)
+   ------------------------- */
+function parseQuery(){
+  const q = new URLSearchParams(location.search);
+  return q.get('adminKey') || '';
 }
-loadWeather();
-setInterval(loadWeather,10*60*1000);
+function showAdminIfNeeded(){
+  const key = parseQuery();
+  if(key === ADMIN_KEY){
+    document.getElementById('adminPanel').classList.add('show-admin');
+    document.getElementById('adminPanel').style.display = 'block';
+  }
+}
+function runRevenueCalc(){
+  const visitors = parseInt(document.getElementById('adminVisitors').value) || 0;
+  const pageviewsPerVisitor = 2.5;
+  const adsPerPage = 4;
+  const ctr = 0.01; // 1%
+  const cpc = 2; // ZAR per click (estimate)
+  const monthlyDays = 30;
 
-// ---------- Navigation & Back to Top ----------
-function showCategory(cat){ document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active')); event.target.classList.add('active'); loadCategoryNews(cat); loadEvents(); loadCarousel(); loadBreakingNews(); loadCityAlerts(); loadWeather(); }
-const backToTopBtn=document.getElementById("backToTop");
-window.onscroll=function(){ if(document.body.scrollTop>300||document.documentElement.scrollTop>300) backToTopBtn.style.display="block"; else backToTopBtn.style.display="none"; };
-backToTopBtn.addEventListener("click",()=>{window.scrollTo({top:0,behavior:'smooth'});});
+  const monthlyPageviews = visitors * pageviewsPerVisitor * monthlyDays;
+  const impressions = monthlyPageviews * adsPerPage;
+  const clicks = impressions * ctr;
+  const monthlyRevenue = clicks * cpc;
+  const dailyRevenue = monthlyRevenue / monthlyDays;
 
-// ---------- Initial Load ----------
-loadCategoryNews('general');
-loadEvents();
-loadCarousel();
-loadBreakingNews();
-setInterval(()=>{ const active=document.querySelector('nav button.active').innerText.toLowerCase(); loadCategoryNews(active); loadEvents(); loadCarousel(); loadBreakingNews(); loadCityAlerts(); loadWeather(); },5*60*1000);
+  document.getElementById('adminDaily').innerText = dailyRevenue.toFixed(2);
+  document.getElementById('adminMonthly').innerText = monthlyRevenue.toFixed(2);
+
+  // Send email via EmailJS if initialized (send once per calculation)
+  if(typeof emailjs !== 'undefined' && EMAILJS_SERVICE_ID !== 'YOUR_SERVICE_ID' && EMAILJS_TEMPLATE_ID !== 'YOUR_TEMPLATE_ID'){
+    const payload = {
+      to_email: 'muvhangos@gmail.com',
+      dailyRevenue: dailyRevenue.toFixed(2),
+      monthlyRevenue: monthlyRevenue.toFixed(2)
+    };
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, payload)
+      .then(r => console.log('Revenue email sent', r.status, r.text))
+      .catch(err => console.error('EmailJS error', err));
+  } else {
+    console.log('EmailJS not configured; calculation done locally.');
+  }
+}
+
+/* -------------------------
+   Boot: initialize on load
+   ------------------------- */
+(async function boot(){
+  showAdminIfNeeded();
+  // Initial quick-load: load feeds and start carousels
+  await refreshAll();
+
+  // periodic refresh
+  setInterval(refreshAll, REFRESH_FEEDS_MS);
+
+  // pause-on-hover is handled by onmouseenter/onmouseleave handlers on each carousel
+})();
 </script>
 </body>
 </html>
