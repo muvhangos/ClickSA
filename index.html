@@ -23,8 +23,6 @@ nav button{background:none;border:none;color:#fff;cursor:pointer;padding:8px 10p
 nav button.active{border-bottom:2px solid var(--accent3);color:var(--accent3)}
 main{max-width:1200px;margin:48px auto 18px;padding:0 14px}
 h2{margin:0;font-size:1.2rem;margin-bottom:8px}
-
-/* Carousel Styles */
 .carousel-wrap {position:relative;overflow:hidden;width:100%;display:flex;align-items:center;height:220px;margin-bottom:20px;}
 .carousel-track {display:flex;transition:transform 0.8s ease-in-out;}
 .carousel-card {min-width:300px;margin-right:16px;flex-shrink:0;background:var(--card);border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.08);overflow:hidden;display:flex;flex-direction:column;}
@@ -33,8 +31,6 @@ h2{margin:0;font-size:1.2rem;margin-bottom:8px}
 .carousel-card .title {font-weight:700;margin-bottom:6px;font-size:1rem;}
 .carousel-card .desc {color:#555;font-size:0.92rem;line-height:1.2;max-height:3.6em;overflow:hidden;}
 .carousel-card .actions a {color:var(--accent2);text-decoration:none;font-weight:600;font-size:0.92rem;}
-
-/* Event Cards */
 .cards{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
 .cards .card-inner{background:var(--card);border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.08);overflow:hidden;display:flex;flex-direction:column}
 .cards img{width:100%;height:180px;object-fit:cover}
@@ -42,13 +38,12 @@ h2{margin:0;font-size:1.2rem;margin-bottom:8px}
 .cards .title{font-weight:700;margin-bottom:8px;font-size:1rem}
 .cards .desc{color:#555;font-size:0.92rem;line-height:1.2;max-height:3.6em;overflow:hidden}
 .cards .actions a{color:var(--accent2);text-decoration:none;font-weight:600}
-
-/* Admin Panel */
 #adminPanel{display:none;padding:12px;background:#fff;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.06);margin:12px 0}
 .show-admin{display:block}
-
 footer{margin-top:18px;padding:18px;background:#222;color:#fff;text-align:center;font-size:0.9rem}
+.adsense-box{margin-top:6px;text-align:center;}
 </style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 </head>
 <body>
 
@@ -72,7 +67,6 @@ footer{margin-top:18px;padding:18px;background:#222;color:#fff;text-align:center
 </nav>
 
 <main>
-  <!-- Carousel for Top Headlines -->
   <section>
     <h2>Top Headlines</h2>
     <div class="carousel-wrap">
@@ -80,22 +74,25 @@ footer{margin-top:18px;padding:18px;background:#222;color:#fff;text-align:center
     </div>
   </section>
 
-  <!-- Events Section -->
   <section>
     <h2>Events & Entertainment</h2>
     <div class="cards" id="eventsCards"></div>
   </section>
 
-  <!-- Admin Panel -->
+  <section id="localInsightsSection">
+    <h2>Local Insights</h2>
+    <div class="cards" id="localInsightsCards"></div>
+  </section>
+
   <div id="adminPanel">
-    <h3>Admin — Revenue Simulator (ZAR)</h3>
-    <div style="display:flex;gap:12px;align-items:center">
+    <h3>Admin Panel — Revenue & Content Management</h3>
+    <div style="margin-bottom:12px;">
       <label>Daily visitors: <input id="adminVisitors" type="number" value="3000" style="width:120px;margin-left:8px"></label>
-      <button onclick="runRevenueCalc()">Calculate & Email</button>
-    </div>
-    <div style="margin-top:12px">
-      <strong>Estimated Daily:</strong> ZAR <span id="adminDaily">0</span> &nbsp; • &nbsp;
-      <strong>Estimated Monthly:</strong> ZAR <span id="adminMonthly">0</span>
+      <button onclick="runRevenueCalc()">Calculate Revenue</button>
+      <div style="margin-top:6px">
+        <strong>Estimated Daily:</strong> ZAR <span id="adminDaily">0</span> &nbsp; • &nbsp;
+        <strong>Estimated Monthly:</strong> ZAR <span id="adminMonthly">0</span>
+      </div>
     </div>
   </div>
 </main>
@@ -105,8 +102,6 @@ footer{margin-top:18px;padding:18px;background:#222;color:#fff;text-align:center
 </footer>
 
 <script>
-// === Optimized JS ===
-const FALLBACK_IMG='https://via.placeholder.com/800x450?text=ClickSA';
 const RSS_FEEDS={
   general:['https://www.news24.com/rss','https://ewn.co.za/RSS'],
   business:['https://www.businesslive.co.za/bd/rss/','https://businesstech.co.za/feed/'],
@@ -114,66 +109,58 @@ const RSS_FEEDS={
   entertainment:['https://www.channel24.co.za/rss','https://www.iol.co.za/entertainment/rss'],
   events:['https://www.capetownmagazine.com/rss','https://www.joburg.co.za/feed/']
 };
+const categories=['general','business','sports','entertainment','events'];
+const FALLBACK_IMG='https://via.placeholder.com/800x450?text=ClickSA';
+let tabData={};
 
-const feedCache={};
-
+// Fetch RSS
 async function fetchFeed(url){
-  if(feedCache[url]) return feedCache[url];
   try{
-    const resp=await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`, {cache:'no-store'});
-    const json=await resp.json();
-    const items=(json.items||[]).map(it=>({
+    const resp = await fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(url));
+    const json = await resp.json();
+    return (json.items||[]).map(it=>({
       title: it.title||'',
       link: it.link||'#',
-      description:(it.description||it.content||'').replace(/(<([^>]+)>)/gi,''),
-      pubDate: it.pubDate||'',
-      thumbnail:(it.thumbnail||it.enclosure&&it.enclosure.link)||FALLBACK_IMG
+      description: (it.description||it.content||'').replace(/(<([^>]+)>)/gi,''),
+      thumbnail: it.thumbnail||it.enclosure?.link||FALLBACK_IMG
     }));
-    feedCache[url]=items;
-    return items;
   }catch(e){ return []; }
 }
 
-async function loadAllFeeds(cat){
-  const feeds=RSS_FEEDS[cat]||[];
-  const results = await Promise.allSettled(feeds.map(fetchFeed));
-  let items=[];
-  results.forEach(r=>{if(r.status==='fulfilled') items = items.concat(r.value)});
-  return items;
+// Load tabs
+async function loadAllTabs(){
+  for(const cat of categories){
+    const feeds=RSS_FEEDS[cat]||[];
+    const results=await Promise.allSettled(feeds.map(fetchFeed));
+    let items=[];
+    results.forEach(r=>{ if(r.status==='fulfilled') items=items.concat(r.value) });
+    tabData[cat]=items.slice(0,12);
+  }
+  renderAllTabs();
 }
 
-// Carousel
-const carouselTrack = document.getElementById('carouselTrack');
-let carouselIndex=0;
-async function loadCarousel(){
-  const items = await loadAllFeeds('general');
+// Render tabs
+function renderAllTabs(){
+  // Carousel
+  const carouselTrack=document.getElementById('carouselTrack');
   carouselTrack.innerHTML='';
-  items.slice(0,12).forEach(it=>{
-    const card=document.createElement('div');
-    card.className='carousel-card';
-    card.innerHTML=`<img src="${it.thumbnail}" alt="">
-                    <div class="content">
-                      <div class="title">${it.title}</div>
-                      <div class="desc">${it.description}</div>
-                      <div class="actions"><a href="${it.link}" target="_blank">Read full story</a></div>
-                    </div>`;
-    carouselTrack.appendChild(card);
+  ['general','business','sports','entertainment'].forEach(cat=>{
+    tabData[cat].forEach(it=>{
+      const card=document.createElement('div');
+      card.className='carousel-card';
+      card.innerHTML=`<img src="${it.thumbnail}" alt="">
+                      <div class="content">
+                        <div class="title">${it.title}</div>
+                        <div class="desc">${it.description}</div>
+                        <div class="actions"><a href="${it.link}" target="_blank">Read full story</a></div>
+                      </div>`;
+      carouselTrack.appendChild(card);
+    });
   });
-  if(items.length<2) return;
-  setInterval(()=>{
-    carouselIndex++;
-    if(carouselIndex >= items.length) carouselIndex=0;
-    const cardWidth = carouselTrack.querySelector('.carousel-card').offsetWidth + 16;
-    carouselTrack.style.transform=`translateX(-${carouselIndex * cardWidth}px)`;
-  },10000);
-}
-
-// Events
-const eventsContainer=document.getElementById('eventsCards');
-async function loadEvents(){
-  const items = await loadAllFeeds('events');
+  // Events
+  const eventsContainer=document.getElementById('eventsCards');
   eventsContainer.innerHTML='';
-  items.slice(0,12).forEach(it=>{
+  tabData['events'].forEach(it=>{
     const card=document.createElement('div');
     card.className='card-inner';
     card.innerHTML=`<img src="${it.thumbnail}" alt="">
@@ -184,35 +171,36 @@ async function loadEvents(){
                     </div>`;
     eventsContainer.appendChild(card);
   });
+  // Breaking news
+  const breakingTicker=document.getElementById('breakingNewsContent');
+  let allItems=[];
+  categories.forEach(cat=>allItems=allItems.concat(tabData[cat]));
+  breakingTicker.innerText=allItems.slice(0,15).map(i=>`🎉 ${i.title}`).join('  •  ');
 }
-
-// Breaking News Ticker
-const breakingTicker=document.getElementById('breakingNewsContent');
-async function loadBreakingNews(){
-  const allFeeds = Object.keys(RSS_FEEDS).flatMap(cat=>RSS_FEEDS[cat]);
-  const allItems=(await Promise.all(allFeeds.map(fetchFeed))).flat();
-  breakingTicker.innerText = allItems.slice(0,15).map(i=>`🎉 ${i.title}`).join('  •  ');
-}
-
-// Admin
-function parseQuery(){return new URLSearchParams(location.search).get('adminKey')||'';}
-function showAdminIfNeeded(){if(parseQuery()==='supersecret'){document.getElementById('adminPanel').classList.add('show-admin');document.getElementById('adminPanel').style.display='block';}}
-function runRevenueCalc(){const visitors=parseInt(document.getElementById('adminVisitors').value)||0;const pageviewsPerVisitor=2.5;const adsPerPage=4;const ctr=0.01;const cpc=2;const monthlyDays=30;const monthlyPageviews=visitors*pageviewsPerVisitor*monthlyDays;const impressions=monthlyPageviews*adsPerPage;const clicks=impressions*ctr;const monthlyRevenue=clicks*cpc;const dailyRevenue=monthlyRevenue/monthlyDays;document.getElementById('adminDaily').innerText=dailyRevenue.toFixed(2);document.getElementById('adminMonthly').innerText=monthlyRevenue.toFixed(2);}
 
 // Navigation
 function handleNav(e){
-  const btn=e.currentTarget;
   document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  const cat=btn.dataset.cat;
-  if(cat==='events'){loadEvents();}else{loadCarousel();}
+  e.currentTarget.classList.add('active');
 }
 
+// Revenue calculator
+function runRevenueCalc(){
+  const visitors=parseInt(document.getElementById('adminVisitors').value)||0;
+  const pageviewsPerVisitor=2.5, adsPerPage=4, ctr=0.01, cpc=2, monthlyDays=30;
+  const monthlyPageviews=visitors*pageviewsPerVisitor*monthlyDays;
+  const clicks=monthlyPageviews*adsPerPage*ctr;
+  const monthlyRevenue=clicks*cpc;
+  const dailyRevenue=monthlyRevenue/monthlyDays;
+  document.getElementById('adminDaily').innerText=dailyRevenue.toFixed(2);
+  document.getElementById('adminMonthly').innerText=monthlyRevenue.toFixed(2);
+}
+
+// Auto-refresh
+setInterval(loadAllTabs,60000);
+
 // Boot
-(async function boot(){
-  showAdminIfNeeded();
-  await Promise.all([loadCarousel(),loadEvents(),loadBreakingNews()]);
-})();
+loadAllTabs();
 </script>
 </body>
 </html>
