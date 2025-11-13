@@ -40,8 +40,10 @@ h2{margin:0;font-size:1.2rem;margin-bottom:8px}
 .cards .actions a{color:var(--accent2);text-decoration:none;font-weight:600}
 #adminPanel{display:none;padding:12px;background:#fff;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.06);margin:12px 0}
 .show-admin{display:block}
+.revenue-table{margin-top:12px;width:100%;border-collapse:collapse;}
+.revenue-table th, .revenue-table td{border:1px solid #ddd;padding:8px;text-align:center;}
+.revenue-table th{background-color:var(--accent2);color:#fff;}
 footer{margin-top:18px;padding:18px;background:#222;color:#fff;text-align:center;font-size:0.9rem}
-.adsense-box{margin-top:6px;text-align:center;}
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 </head>
@@ -84,123 +86,83 @@ footer{margin-top:18px;padding:18px;background:#222;color:#fff;text-align:center
     <div class="cards" id="localInsightsCards"></div>
   </section>
 
-  <div id="adminPanel">
-    <h3>Admin Panel — Revenue & Content Management</h3>
+  <div id="adminPanel" class="show-admin">
+    <h3>Admin Panel — Live Revenue Simulator</h3>
     <div style="margin-bottom:12px;">
-      <label>Daily visitors: <input id="adminVisitors" type="number" value="3000" style="width:120px;margin-left:8px"></label>
-      <button onclick="runRevenueCalc()">Calculate Revenue</button>
-      <div style="margin-top:6px">
-        <strong>Estimated Daily:</strong> ZAR <span id="adminDaily">0</span> &nbsp; • &nbsp;
-        <strong>Estimated Monthly:</strong> ZAR <span id="adminMonthly">0</span>
-      </div>
+      <label>CTR (%): <input id="ctrInput" type="number" value="1" style="width:80px"></label>
+      <label style="margin-left:12px">CPC (ZAR): <input id="cpcInput" type="number" value="2" style="width:80px"></label>
+      <button onclick="calculateRevenue()">Recalculate Revenue</button>
     </div>
+    <div style="margin-top:6px">
+      <strong>Daily Revenue:</strong> ZAR <span id="dailyRev">0</span> • 
+      <strong>Monthly Revenue:</strong> ZAR <span id="monthlyRev">0</span>
+    </div>
+
+    <h4>Simulation Table</h4>
+    <table class="revenue-table">
+      <thead>
+        <tr><th>Visitors</th><th>CTR %</th><th>CPC (ZAR)</th><th>Daily Revenue</th><th>Monthly Revenue</th></tr>
+      </thead>
+      <tbody id="revenueTableBody"></tbody>
+    </table>
   </div>
 </main>
 
 <footer>
-  &copy; 2025 ClickSA • Contact: muvhangos@gmail.com
+  &copy; 2025 Wintech Technologies • Contact: infor@wintech.co.za
 </footer>
 
 <script>
-const RSS_FEEDS={
-  general:['https://www.news24.com/rss','https://ewn.co.za/RSS'],
-  business:['https://www.businesslive.co.za/bd/rss/','https://businesstech.co.za/feed/'],
-  sports:['https://www.sport24.co.za/RSS','https://www.bbc.co.uk/sport/africa/rss.xml'],
-  entertainment:['https://www.channel24.co.za/rss','https://www.iol.co.za/entertainment/rss'],
-  events:['https://www.capetownmagazine.com/rss','https://www.joburg.co.za/feed/']
-};
-const categories=['general','business','sports','entertainment','events'];
-const FALLBACK_IMG='https://via.placeholder.com/800x450?text=ClickSA';
-let tabData={};
+// Track live visitors per tab
+let tabViews={'general':0,'business':0,'sports':0,'entertainment':0,'events':0};
+const pageviewsPerVisitor=2.5, adsPerPage=4, monthlyDays=30;
 
-// Fetch RSS
-async function fetchFeed(url){
-  try{
-    const resp = await fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(url));
-    const json = await resp.json();
-    return (json.items||[]).map(it=>({
-      title: it.title||'',
-      link: it.link||'#',
-      description: (it.description||it.content||'').replace(/(<([^>]+)>)/gi,''),
-      thumbnail: it.thumbnail||it.enclosure?.link||FALLBACK_IMG
-    }));
-  }catch(e){ return []; }
-}
-
-// Load tabs
-async function loadAllTabs(){
-  for(const cat of categories){
-    const feeds=RSS_FEEDS[cat]||[];
-    const results=await Promise.allSettled(feeds.map(fetchFeed));
-    let items=[];
-    results.forEach(r=>{ if(r.status==='fulfilled') items=items.concat(r.value) });
-    tabData[cat]=items.slice(0,12);
-  }
-  renderAllTabs();
-}
-
-// Render tabs
-function renderAllTabs(){
-  // Carousel
-  const carouselTrack=document.getElementById('carouselTrack');
-  carouselTrack.innerHTML='';
-  ['general','business','sports','entertainment'].forEach(cat=>{
-    tabData[cat].forEach(it=>{
-      const card=document.createElement('div');
-      card.className='carousel-card';
-      card.innerHTML=`<img src="${it.thumbnail}" alt="">
-                      <div class="content">
-                        <div class="title">${it.title}</div>
-                        <div class="desc">${it.description}</div>
-                        <div class="actions"><a href="${it.link}" target="_blank">Read full story</a></div>
-                      </div>`;
-      carouselTrack.appendChild(card);
-    });
-  });
-  // Events
-  const eventsContainer=document.getElementById('eventsCards');
-  eventsContainer.innerHTML='';
-  tabData['events'].forEach(it=>{
-    const card=document.createElement('div');
-    card.className='card-inner';
-    card.innerHTML=`<img src="${it.thumbnail}" alt="">
-                    <div class="content">
-                      <div class="title">${it.title}</div>
-                      <div class="desc">${it.description}</div>
-                      <div class="actions"><a href="${it.link}" target="_blank">View Event</a></div>
-                    </div>`;
-    eventsContainer.appendChild(card);
-  });
-  // Breaking news
-  const breakingTicker=document.getElementById('breakingNewsContent');
-  let allItems=[];
-  categories.forEach(cat=>allItems=allItems.concat(tabData[cat]));
-  breakingTicker.innerText=allItems.slice(0,15).map(i=>`🎉 ${i.title}`).join('  •  ');
-}
-
-// Navigation
+// Simulate a visitor viewing a tab
 function handleNav(e){
   document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
   e.currentTarget.classList.add('active');
+  const tab=e.currentTarget.dataset.cat;
+  tabViews[tab]+=1; // increment live views
+  calculateRevenue();
 }
 
-// Revenue calculator
-function runRevenueCalc(){
-  const visitors=parseInt(document.getElementById('adminVisitors').value)||0;
-  const pageviewsPerVisitor=2.5, adsPerPage=4, ctr=0.01, cpc=2, monthlyDays=30;
-  const monthlyPageviews=visitors*pageviewsPerVisitor*monthlyDays;
+// Revenue calculator based on live views
+function calculateRevenue(){
+  const ctr=parseFloat(document.getElementById('ctrInput').value)/100||0.01;
+  const cpc=parseFloat(document.getElementById('cpcInput').value)||2;
+
+  const totalVisitors=Object.values(tabViews).reduce((a,b)=>a+b,0);
+  const monthlyPageviews=totalVisitors*pageviewsPerVisitor*monthlyDays;
   const clicks=monthlyPageviews*adsPerPage*ctr;
   const monthlyRevenue=clicks*cpc;
   const dailyRevenue=monthlyRevenue/monthlyDays;
-  document.getElementById('adminDaily').innerText=dailyRevenue.toFixed(2);
-  document.getElementById('adminMonthly').innerText=monthlyRevenue.toFixed(2);
+
+  document.getElementById('dailyRev').innerText=dailyRevenue.toFixed(2);
+  document.getElementById('monthlyRev').innerText=monthlyRevenue.toFixed(2);
+
+  // Update simulation table
+  const visitorOptions=[1000,3000,10000];
+  const ctrOptions=[0.5,1,2];
+  const cpcOptions=[1.5,2,3];
+  const tbody=document.getElementById('revenueTableBody');
+  tbody.innerHTML='';
+  visitorOptions.forEach(v=>{
+    ctrOptions.forEach(ct=>{
+      cpcOptions.forEach(cp=>{
+        const mpv=v*pageviewsPerVisitor*monthlyDays;
+        const clicks=mpv*adsPerPage*(ct/100);
+        const mr=clicks*cp;
+        const dr=mr/monthlyDays;
+        const row=document.createElement('tr');
+        row.innerHTML=`<td>${v}</td><td>${ct}%</td><td>${cp}</td><td>${dr.toFixed(2)}</td><td>${mr.toFixed(2)}</td>`;
+        tbody.appendChild(row);
+      });
+    });
+  });
 }
 
-// Auto-refresh
-setInterval(loadAllTabs,60000);
-
-// Boot
-loadAllTabs();
+// Initial load
+calculateRevenue();
 </script>
 </body>
 </html>
