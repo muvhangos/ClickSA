@@ -1,284 +1,139 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<title>😂 Viral Jokes & Daily News</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ClickSA | Live South African Headlines & Events</title>
-<meta name="description" content="ClickSA brings you the latest South African news, entertainment, and upcoming events. Stay updated with local insights, lifestyle, and fun happenings across SA.">
+
+<!-- GOOGLE ADSENSE (REPLACE ca-pub-XXXX) -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXX"
+     crossorigin="anonymous"></script>
+
+<!-- GOOGLE ANALYTICS (REPLACE G-XXXXXXX) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-XXXXXXX');
+</script>
+
 <style>
-body { font-family:'Poppins',sans-serif; background:#f8f9fa; margin:0; padding:0; color:#222; }
-header { background:linear-gradient(to right,#007bff,#00b74a,#ffcc00); color:white; text-align:center; padding:20px; font-size:1.8em; font-weight:bold; display:flex; justify-content:center; align-items:center; gap:10px; overflow:hidden; position:relative; }
-.logo-icon { width:35px; height:25px; border-radius:4px; animation:spin 6s linear infinite; }
-.click-icon { display:inline-block; margin-left:8px; animation:clickMove 1s infinite; }
-@keyframes spin { from{transform:rotateY(0);} to{transform:rotateY(360deg);} }
-@keyframes clickMove { 0%{transform:translateY(0);} 50%{transform:translateY(-5px);} 100%{transform:translateY(0);} }
-
-nav { display:flex; justify-content:center; background:#222; color:white; gap:20px; padding:10px; flex-wrap:wrap; }
-nav button { background:none; border:none; color:white; cursor:pointer; font-size:1em; transition:color .3s; }
-nav button:hover { color:#00b74a; }
-nav button.active { border-bottom:2px solid #ffcc00; color:#ffcc00; }
-
-.news-container { display:flex; flex-wrap:wrap; justify-content:center; gap:20px; padding:20px; }
-.news-card { background:#fff; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1); overflow:hidden; width:300px; transition:transform .2s; display:flex; flex-direction:column; }
-.news-card:hover { transform:translateY(-5px); }
-.news-card img { width:100%; height:180px; object-fit:cover; }
-.news-content { padding:15px; display:flex; flex-direction:column; flex:1; }
-.news-title { font-size:18px; font-weight:bold; margin-bottom:10px; color:#222; }
-.news-desc { font-size:14px; color:#555; margin-bottom:10px; }
-.news-meta { font-size:12px; color:#888; margin-bottom:10px; }
-
-#eventsGrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:20px; padding:20px; }
-.event-card { background:#fff; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.1); overflow:hidden; transition:transform .2s, box-shadow .2s; }
-.event-card:hover { transform:translateY(-6px); box-shadow:0 4px 10px rgba(0,0,0,0.2); }
-.event-card img { width:100%; height:160px; object-fit:cover; }
-.event-content { padding:15px; }
-.event-title { font-weight:bold; font-size:16px; color:#007bff; margin-bottom:6px; }
-.event-date { font-size:13px; color:#00b74a; margin-bottom:6px; }
-.event-location { font-size:13px; color:#ff8800; margin-bottom:10px; }
-.event-link { color:#007bff; font-size:14px; text-decoration:none; }
-.event-link:hover { text-decoration:underline; }
-
-.ads { background:#f1f1f1; text-align:center; margin:20px; padding:10px; border-radius:8px; font-size:14px; }
-
-#backToTop { display:none; position:fixed; bottom:40px; right:30px; z-index:99; font-size:18px; border:none; outline:none; background-color:#00b74a; color:white; cursor:pointer; padding:12px 16px; border-radius:50%; box-shadow:0 2px 6px rgba(0,0,0,0.3); transition:background .3s, transform .3s; }
-#backToTop:hover { background-color:#007bff; transform:scale(1.1); }
-
-#breakingNews { background:#ffcc00; color:#222; padding:8px 0; font-weight:bold; white-space:nowrap; overflow:hidden; position:relative; }
-#breakingNewsContent { display:inline-block; padding-left:100%; }
-
-footer { text-align:center; padding:20px; font-size:14px; background:#222; color:white; }
-footer a { text-decoration:none; }
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  margin: 0;
+  padding: 15px;
+}
+header {
+  text-align: center;
+}
+h1 { color: #333; }
+select, button {
+  padding: 10px;
+  margin: 5px;
+}
+.card {
+  background: white;
+  padding: 20px;
+  margin-top: 15px;
+  border-radius: 10px;
+  font-size: 18px;
+}
+.share button {
+  background: #1877f2;
+  color: white;
+  border: none;
+  margin: 5px;
+  border-radius: 6px;
+}
+footer {
+  text-align: center;
+  margin-top: 30px;
+  color: gray;
+}
 </style>
 </head>
+
 <body>
 
 <header>
-  🇿🇦 ClickSA
-  <span class="click-icon">
-    <svg width="24" height="24" viewBox="0 0 24 24">
-      <path d="M2 21h2V9.414l5.293 5.293 1.414-1.414L6 7.586V3h2v4.586l4.293 4.293 1.414-1.414L10 5.586V3h2v7.586l4 4V5h2v11.586l3.707 3.707-1.414 1.414L2 5V21z"/>
-    </svg>
-  </span>
-  <img class="logo-icon" src="https://upload.wikimedia.org/wikipedia/commons/a/af/Flag_of_South_Africa.svg" alt="SA Flag">
+  <h1>😂 Viral Jokes Blog</h1>
+  <p>Auto-Updating Funny Content Every Day</p>
+
+  <select id="category">
+    <option value="random">😂 Random</option>
+    <option value="love">❤️ Love</option>
+    <option value="tech">💻 Tech</option>
+    <option value="school">🎓 School</option>
+  </select>
+
+  <button onclick="generate()">Generate</button>
 </header>
 
-<div id="breakingNews"><div id="breakingNewsContent">Loading breaking news...</div></div>
+<div class="card" id="content">
+Click Generate to see viral content 😄
+</div>
 
-<nav>
-  <button class="active" onclick="showCategory('general')">General</button>
-  <button onclick="showCategory('business')">Business</button>
-  <button onclick="showCategory('sports')">Sports</button>
-  <button onclick="showCategory('events')">Events</button>
-</nav>
-
-<div class="ads">[Your AdSense ad here]</div>
-
-<section style="padding:20px;text-align:center;max-width:700px;margin:auto;">
-  <h2>Welcome to ClickSA</h2>
-  <p>South Africa’s source for breaking news, entertainment, and upcoming lifestyle events — from music festivals to city expos.</p>
-</section>
-
-<section style="padding:20px;text-align:center;max-width:900px;margin:auto;">
-  <h2>Top Picks of the Day</h2>
-  <div id="topPicks" class="news-container"></div>
-</section>
-
-<section style="padding:20px;text-align:center;max-width:700px;margin:auto;">
-  <h2>Local Insights</h2>
-  <p>Get updates on what's happening near you — concerts, carnivals, art shows, and live events across SA.</p>
-</section>
-
-<div id="newsContainer" class="news-container"><p>Loading latest headlines...</p></div>
-
-<!-- 🌟 Events Calendar -->
-<section style="padding:20px;text-align:center;max-width:1100px;margin:auto;">
-  <h2>🎊 Upcoming Events Calendar (South Africa)</h2>
-  <div id="eventsGrid"><p>Loading upcoming events...</p></div>
-</section>
-
-<button id="backToTop" title="Back to Top">⬆️</button>
+<div class="share">
+  <button onclick="shareWhatsApp()">WhatsApp</button>
+  <button onclick="shareFacebook()">Facebook</button>
+</div>
 
 <footer>
-  &copy; 2025 ClickSA | Powered by Wintech Technologies<br>
-  <a href="#" style="color:#ffcc00;">Privacy Policy</a> | 
-  <a href="#" style="color:#00b74a;">About</a> | 
-  <a href="#" style="color:#00b74a;">Contact</a>
+  © 2026 Viral Joke Blog • Made for Facebook Traffic
 </footer>
 
 <script>
-const categories = {
-  general: [
-    { url:'https://www.news24.com/rss', region:'South Africa' },
-    { url:'https://ewn.co.za/RSS', region:'South Africa' },
-    { url:'https://www.timeslive.co.za/rss/', region:'South Africa' },
-    { url:'https://www.iol.co.za/cmlink/1.640', region:'South Africa' }
+const jokes = {
+  love: [
+    "❤️ Love is like Wi-Fi — when it’s strong, everything connects.",
+    "I told my heart to stop falling in love… it tripped instead 😂",
+    "Love is sharing your charger even when your battery is at 1%"
   ],
-  business: [
-    { url:'https://www.businesslive.co.za/bd/rss/', region:'Business' },
-    { url:'https://businesstech.co.za/news/feed/', region:'Business' },
-    { url:'https://rss.cnn.com/rss/money_news_international.rss', region:'International Business' }
+  tech: [
+    "💻 I changed my password to 'incorrect' — now it reminds me 😂",
+    "Why do programmers love dark mode? Because light attracts bugs!",
+    "My computer beats me at chess, but I beat it at unplugging."
   ],
-  sports: [
-    { url:'https://www.sport24.co.za/RSS', region:'Sports' },
-    { url:'https://ewn.co.za/RSS/Sport', region:'Sports' },
-    { url:'https://www.bbc.co.uk/sport/africa/rss.xml', region:'Africa Sports' }
+  school: [
+    "🎓 School teaches us patience… especially waiting for the bell.",
+    "Homework: Because free time is overrated.",
+    "Exams are like Wi-Fi signals — weak when you need them most."
   ],
-  events: [
-    { url:'https://www.iol.co.za/entertainment/rss', region:'Entertainment' },
-    { url:'https://www.channel24.co.za/rss', region:'Events & Lifestyle' },
-    { url:'https://www.capetownmagazine.com/rss', region:'Cape Town Events' },
-    { url:'https://www.joburg.co.za/feed/', region:'Johannesburg Events' },
-    { url:'https://www.timeout.com/south-africa/things-to-do/rss', region:'Things To Do' }
+  random: [
+    "😂 I put my phone in airplane mode… now it won’t take off.",
+    "Life is short. Smile while you still have teeth.",
+    "I started running… out of motivation."
   ]
 };
 
-const fallbackImages = [
-  'https://via.placeholder.com/300x180?text=ClickSA+News',
-  'https://via.placeholder.com/300x180?text=SA+Events',
-  'https://via.placeholder.com/300x180?text=Fun+in+SA',
-  'https://via.placeholder.com/300x180?text=Entertainment'
-];
-
-async function fetchFeed(feed){
-  try {
-    const resp = await fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(feed.url));
-    const data = await resp.json();
-    if(!data.items) return [];
-    return data.items.map(item => ({
-      title: item.title,
-      description: item.description || '',
-      link: item.link,
-      image: (item.enclosure && item.enclosure.link) || item.thumbnail || '',
-      region: feed.region,
-      commentary: generateCommentary(item.title, item.description)
-    }));
-  } catch(e){ return []; }
+// DAILY AUTO ROTATION
+function dailyIndex(arr) {
+  const day = Math.floor(Date.now() / 86400000);
+  return arr[day % arr.length];
 }
 
-function generateCommentary(title, description){
-  const text = description.replace(/<[^>]+>/g,'').trim();
-  if(!text) return `Catch up on "${title}" – powered by ClickSA.`;
-  const sentences = text.split('.').filter(s=>s.trim().length>20);
-  const summary = sentences.slice(0,2).join('. ') + '.';
-  return summary + ' ClickSA gives local insight and updates!';
+function generate() {
+  const cat = document.getElementById("category").value;
+  const content = dailyIndex(jokes[cat]);
+  document.getElementById("content").innerText = content;
 }
 
-async function loadNews(category='general'){
-  const container=document.getElementById('newsContainer');
-  container.innerHTML='<p>Loading news...</p>';
-  const feeds=categories[category];
-  const results=await Promise.all(feeds.map(fetchFeed));
-  const all=results.flat();
-  container.innerHTML='';
-  all.slice(0,18).forEach(article=>{
-    const card=document.createElement('div');
-    card.className='news-card';
-    card.innerHTML=`
-      <img src="${article.image || fallbackImages[Math.floor(Math.random()*fallbackImages.length)]}" alt="News" loading="lazy">
-      <div class="news-content">
-        <div class="news-title">${article.title}</div>
-        <div class="news-desc">${article.commentary}</div>
-        <div class="news-meta">${article.region}</div>
-        <a href="${article.link}" target="_blank">Read Full Story</a>
-      </div>`;
-    container.appendChild(card);
-  });
+// AUTO LOAD DAILY CONTENT
+generate();
+
+// SHARE FUNCTIONS
+function shareWhatsApp() {
+  const text = document.getElementById("content").innerText;
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
 }
 
-// 🎊 Load Events Calendar
-async function loadEventsCalendar(){
-  const grid=document.getElementById('eventsGrid');
-  grid.innerHTML='<p>Loading...</p>';
-  const feeds=categories.events;
-  const results=await Promise.all(feeds.map(fetchFeed));
-  const all=results.flat().slice(0,12);
-  grid.innerHTML='';
-  all.forEach(ev=>{
-    const div=document.createElement('div');
-    div.className='event-card';
-    div.innerHTML=`
-      <img src="${ev.image || 'https://via.placeholder.com/300x180?text=Event+in+SA'}" alt="Event Image" loading="lazy">
-      <div class="event-content">
-        <div class="event-title">${ev.title}</div>
-        <div class="event-date">🗓️ ${new Date().toLocaleDateString('en-ZA')}</div>
-        <div class="event-location">${ev.region}</div>
-        <a class="event-link" href="${ev.link}" target="_blank">View Event Details</a>
-      </div>`;
-    grid.appendChild(div);
-  });
+function shareFacebook() {
+  const url = window.location.href;
+  <!-- window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`); -->
 }
-
-async function loadTopPicks(){
-  const container=document.getElementById('topPicks');
-  container.innerHTML='';
-  const allFeeds=[...categories.general,...categories.events];
-  const allNews=(await Promise.all(allFeeds.map(fetchFeed))).flat();
-  allNews.sort(()=>Math.random()-0.5);
-  allNews.slice(0,5).forEach(article=>{
-    const card=document.createElement('div');
-    card.className='news-card';
-    card.innerHTML=`
-      <img src="${article.image || fallbackImages[Math.floor(Math.random()*fallbackImages.length)]}" alt="Top Pick" loading="lazy">
-      <div class="news-content">
-        <div class="news-title">${article.title}</div>
-        <div class="news-desc">${article.commentary}</div>
-        <div class="news-meta">${article.region}</div>
-        <a href="${article.link}" target="_blank">Read Full Story</a>
-      </div>`;
-    container.appendChild(card);
-  });
-}
-
-async function loadBreakingNews(){
-  const container=document.getElementById('breakingNewsContent');
-  const allFeeds=[...categories.general,...categories.business,...categories.sports,...categories.events];
-  const allNews=(await Promise.all(allFeeds.map(fetchFeed))).flat();
-  const headlines=allNews.slice(0,15).map(i=>`🎉 ${i.title}`).join('  •  ');
-  container.innerText=headlines;
-  animateTicker(container);
-}
-
-function animateTicker(container){
-  let start=container.offsetWidth;
-  container.style.transform=`translateX(${start}px)`;
-  const speed=1;
-  function tick(){
-    const left=container.getBoundingClientRect().left;
-    if(left+container.offsetWidth<0) container.style.transform=`translateX(${window.innerWidth}px)`;
-    else container.style.transform=`translateX(${left-speed}px)`;
-    requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(tick);
-}
-
-const backToTopBtn=document.getElementById("backToTop");
-window.onscroll=function(){
-  if(document.body.scrollTop>300||document.documentElement.scrollTop>300) backToTopBtn.style.display="block";
-  else backToTopBtn.style.display="none";
-};
-backToTopBtn.addEventListener("click",()=>{window.scrollTo({top:0,behavior:'smooth'});});
-
-function showCategory(cat){
-  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
-  event.target.classList.add('active');
-  loadNews(cat);
-  loadTopPicks();
-  loadEventsCalendar();
-  loadBreakingNews();
-}
-
-loadNews('general');
-loadTopPicks();
-loadEventsCalendar();
-loadBreakingNews();
-setInterval(()=>{
-  const active=document.querySelector('nav button.active').innerText.toLowerCase();
-  loadNews(active);
-  loadTopPicks();
-  loadEventsCalendar();
-  loadBreakingNews();
-},5*60*1000);
 </script>
+
 </body>
 </html>
